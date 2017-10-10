@@ -1,4 +1,4 @@
-# Commandes utils
+# Comandes utils
 
 #Activa el enviroment de python (necessari per correr python dins del projecte)
 `$source ~/meetNRun/restEnv/bin/activate`

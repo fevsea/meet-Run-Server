@@ -26,6 +26,4 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^', include('quedadas.urls')),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    url(r'^quedadas/$', views.quedada_list),
-    url(r'^quedadas/(?P<pk>[0-9]+)/$', views.quedada_detail),
 ]

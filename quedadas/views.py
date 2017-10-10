@@ -47,7 +47,7 @@ def quedada_list(request, format=None):
 @api_view(['GET', 'PUT', 'DELETE'])
 def quedada_detail(request, pk, format=None):
     """
-    Retrieve, update or delete a snippet instance.
+    Obtain, modify or delete a singe Quedada instance by id
     """
     try:
         quedada = Quedada.objects.get(pk=pk)
@@ -68,3 +68,12 @@ def quedada_detail(request, pk, format=None):
     elif request.method == 'DELETE':
         quedada.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+@api_view(['GET'])
+def root(request, format=None):
+    """
+    What can I do for you?
+    """
+
+    data = [1, 2, 3, {'4': 5, '6': 7}]
+    return Response(json.dumps(data, separators=(',', ':')))
