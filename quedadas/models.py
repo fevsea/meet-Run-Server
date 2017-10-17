@@ -2,17 +2,18 @@ from django.db import models
 
 # Create your models here.
 
-class Quedada(models.Model):
+class Meeting(models.Model):
     created = models.DateTimeField(auto_now_add=True)
-    title = models.CharField(max_length=100, blank=True, default='')
-    description = models.TextField()
-    public = models.BooleanField()
+    date = models.DateTimeField(null=False, blank=False)
+    title = models.CharField(max_length=100, blank=False, null=False)
+    description = models.TextField(max_length=500, blank=True)
+    public = models.BooleanField(null=False, blank=False)
+    level = models.IntegerField(null=True, blank=False)
+    latitude = models.FloatField(null=False, blank=False)
+    longitude = models.FloatField(null=False, blank=False)
 
     def __str__(self):
-        if self.title == '':
-            return "Quedada sense títol"
-        else:
-            return self.title
+        return self.title
 
     class Meta:
         ordering = ('created',)

@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 
-from .models import Quedada
+from .models import Meeting
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
@@ -17,5 +17,5 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
 
 class QuedadasSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Quedada
+        model = Meeting
         fields = ('id', 'title', 'description', 'public')

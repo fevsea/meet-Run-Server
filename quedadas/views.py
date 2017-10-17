@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User, Group
+from django.core.serializers import json
 from rest_framework import viewsets
 from rest_framework.response import Response
 
@@ -6,7 +7,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from .models import Quedada
+from .models import Meeting
 from .serializers import UserSerializer, GroupSerializer, QuedadasSerializer
 
 
@@ -31,7 +32,7 @@ def quedada_list(request, format=None):
     List all quedadas, or create a new quedada.
     """
     if request.method == 'GET':
-        quedadas = Quedada.objects.all()
+        quedadas = Meeting.objects.all()
         serializer = QuedadasSerializer(quedadas, many=True)
         return Response(serializer.data)
 
@@ -45,28 +46,28 @@ def quedada_list(request, format=None):
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
-def quedada_detail(request, pk, format=None):
+def meeting_detail(request, pk, format=None):
     """
     Obtain, modify or delete a singe Quedada instance by id
     """
     try:
-        quedada = Quedada.objects.get(pk=pk)
-    except Quedada.DoesNotExist:
+        meeting = Meeting.objects.get(pk=pk)
+    except Meeting.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
-        serializer = QuedadasSerializer(quedada)
+        serializer = QuedadasSerializer(meeting)
         return Response(serializer.data)
 
     elif request.method == 'PUT':
-        serializer = QuedadasSerializer(quedada, data=request.data)
+        serializer = QuedadasSerializer(meeting, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
-        quedada.delete()
+        meeting.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 @api_view(['GET'])

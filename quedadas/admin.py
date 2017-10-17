@@ -1,4 +1,4 @@
 from django.contrib import admin
-from .models import Quedada
+from .models import Meeting
 
-admin.site.register(Quedada)
+admin.site.register(Meeting)
