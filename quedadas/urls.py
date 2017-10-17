@@ -6,7 +6,7 @@ from quedadas import views
 
 urlpatterns = [
     #url(r'^$', views.root),
-    url(r'^meetings/$', views.quedada_list),
+    url(r'^meetings/$', views.meeting_list, name="meeting_list"),
     url(r'^meetings/(?P<pk>[0-9]+)/$', views.meeting_detail),
 ]
 

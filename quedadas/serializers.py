@@ -15,7 +15,7 @@ class GroupSerializer(serializers.HyperlinkedModelSerializer):
         model = Group
         fields = ('url', 'name')
 
-class QuedadasSerializer(serializers.ModelSerializer):
+class MeetingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Meeting
-        fields = ('id', 'title', 'description', 'public')
+        fields = ('id', 'title', 'description', 'public', 'level', 'date', 'latitude', 'longitude')

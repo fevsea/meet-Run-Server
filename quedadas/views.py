@@ -8,7 +8,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 from .models import Meeting
-from .serializers import UserSerializer, GroupSerializer, QuedadasSerializer
+from .serializers import UserSerializer, GroupSerializer, MeetingSerializer
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -27,17 +27,17 @@ class GroupViewSet(viewsets.ModelViewSet):
     serializer_class = GroupSerializer
 
 @api_view(['GET', 'POST'])
-def quedada_list(request, format=None):
+def meeting_list(request, format=None):
     """
-    List all quedadas, or create a new quedada.
+    List all meetings, or create a new meeting.
     """
     if request.method == 'GET':
         quedadas = Meeting.objects.all()
-        serializer = QuedadasSerializer(quedadas, many=True)
+        serializer = MeetingSerializer(quedadas, many=True)
         return Response(serializer.data)
 
     elif request.method == 'POST':
-        serializer = QuedadasSerializer(data=request.data)
+        serializer = MeetingSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -48,7 +48,7 @@ def quedada_list(request, format=None):
 @api_view(['GET', 'PUT', 'DELETE'])
 def meeting_detail(request, pk, format=None):
     """
-    Obtain, modify or delete a singe Quedada instance by id
+    Obtain, modify or delete a singe Meeting instance by id
     """
     try:
         meeting = Meeting.objects.get(pk=pk)
@@ -56,11 +56,11 @@ def meeting_detail(request, pk, format=None):
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
-        serializer = QuedadasSerializer(meeting)
+        serializer = MeetingSerializer(meeting)
         return Response(serializer.data)
 
     elif request.method == 'PUT':
-        serializer = QuedadasSerializer(meeting, data=request.data)
+        serializer = MeetingSerializer(meeting, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)

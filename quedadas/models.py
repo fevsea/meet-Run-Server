@@ -8,7 +8,7 @@ class Meeting(models.Model):
     title = models.CharField(max_length=100, blank=False, null=False)
     description = models.TextField(max_length=500, blank=True)
     public = models.BooleanField(null=False, blank=False)
-    level = models.IntegerField(null=True, blank=False)
+    level = models.IntegerField(null=True, blank=True)
     latitude = models.FloatField(null=False, blank=False)
     longitude = models.FloatField(null=False, blank=False)
 
