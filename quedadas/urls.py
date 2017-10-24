@@ -8,6 +8,8 @@ urlpatterns = [
     url(r'^$', views.api_root),
     url(r'^meetings/$', views.MeetingList.as_view(), name="meeting_list"),
     url(r'^meetings/(?P<pk>[0-9]+)/$', views.MeetingDetail.as_view(), name="meeting_detail"),
+    url(r'^users/$', views.UserList.as_view(), name='user-list'),
+    url(r'^users/(?P<pk>[0-9]+)/$', views.UserDetail.as_view(), name='user-detail')
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
