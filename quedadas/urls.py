@@ -5,9 +5,9 @@ from rest_framework import routers
 from quedadas import views
 
 urlpatterns = [
-    #url(r'^$', views.root),
-    url(r'^meetings/$', views.meeting_list, name="meeting_list"),
-    url(r'^meetings/(?P<pk>[0-9]+)/$', views.meeting_detail),
+    url(r'^$', views.api_root),
+    url(r'^meetings/$', views.MeetingList.as_view(), name="meeting_list"),
+    url(r'^meetings/(?P<pk>[0-9]+)/$', views.MeetingDetail.as_view(), name="meeting_detail"),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

@@ -1,80 +1,32 @@
 from django.contrib.auth.models import User, Group
 from django.core.serializers import json
-from rest_framework import viewsets
+from rest_framework import viewsets, generics, permissions
 from rest_framework.response import Response
 
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.reverse import reverse
 
 from .models import Meeting
 from .serializers import UserSerializer, GroupSerializer, MeetingSerializer
 
 
-class UserViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows users to be viewed or edited.
-    """
-    queryset = User.objects.all().order_by('-date_joined')
-    serializer_class = UserSerializer
+class MeetingList(generics.ListCreateAPIView):
+    queryset = Meeting.objects.all()
+    serializer_class = MeetingSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
 
-class GroupViewSet(viewsets.ModelViewSet):
-    """
-    API endpoint that allows groups to be viewed or edited.
-    """
-    queryset = Group.objects.all()
-    serializer_class = GroupSerializer
+class MeetingDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Meeting.objects.all()
+    serializer_class = MeetingSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
-@api_view(['GET', 'POST'])
-def meeting_list(request, format=None):
-    """
-    List all meetings, or create a new meeting.
-    """
-    if request.method == 'GET':
-        quedadas = Meeting.objects.all()
-        serializer = MeetingSerializer(quedadas, many=True)
-        return Response(serializer.data)
-
-    elif request.method == 'POST':
-        serializer = MeetingSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-
-@api_view(['GET', 'PUT', 'DELETE'])
-def meeting_detail(request, pk, format=None):
-    """
-    Obtain, modify or delete a singe Meeting instance by id
-    """
-    try:
-        meeting = Meeting.objects.get(pk=pk)
-    except Meeting.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    if request.method == 'GET':
-        serializer = MeetingSerializer(meeting)
-        return Response(serializer.data)
-
-    elif request.method == 'PUT':
-        serializer = MeetingSerializer(meeting, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    elif request.method == 'DELETE':
-        meeting.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
 @api_view(['GET'])
-def root(request, format=None):
-    """
-    What can I do for you?
-    """
-
-    data = [1, 2, 3, {'4': 5, '6': 7}]
-    return Response(json.dumps(data, separators=(',', ':')))
+def api_root(request, format=None):
+    return Response({
+        'meetings': reverse('meeting_list', request=request, format=format),
+        #'snippets': reverse('snippet-list', request=request, format=format)
+    })

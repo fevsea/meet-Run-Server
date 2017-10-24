@@ -16,14 +16,14 @@ Including another URLconf
 from django.conf.urls import url
 from django.contrib import admin
 from django.conf.urls import url, include
-from rest_framework import routers
+from rest_framework.schemas import get_schema_view
 
-from quedadas import views
-
+schema_view = get_schema_view(title='MeetNRun API')
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
+    url(r'^schema/$', schema_view),
     url(r'^', include('quedadas.urls')),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]
