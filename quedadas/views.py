@@ -1,15 +1,14 @@
-from django.contrib.auth.models import Group, User
-from django.core.serializers import json
-from rest_framework import viewsets, generics, permissions
-from rest_framework.response import Response
-
-from rest_framework import status
+from django.contrib.auth import authenticate
+from django.contrib.auth.models import User
+from rest_framework import generics, permissions
+from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
+from rest_framework.status import HTTP_401_UNAUTHORIZED
 
 from .models import Meeting
-from .serializers import UserSerializer, MeetingSerializer
+from .serializers import UserSerializer, MeetingSerializer, UserSerializerDetail
 
 
 class MeetingList(generics.ListCreateAPIView):
@@ -24,15 +23,31 @@ class MeetingDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
 
-class UserList(generics.ListAPIView):
+class UserList(generics.ListCreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
-class UserDetail(generics.RetrieveAPIView):
+    def perform_create(self, serializer):
+        instance = serializer.save()
+        instance.set_password(instance.password)
+        instance.save()
+
+class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = UserSerializerDetail
 
 
+@api_view(["POST"])
+def login(request):
+    username = request.data.get("username")
+    password = request.data.get("password")
+
+    user = authenticate(username=username, password=password)
+    if not user:
+        return Response({"error": "Login failed"}, status=HTTP_401_UNAUTHORIZED)
+
+    token, _ = Token.objects.get_or_create(user=user)
+    return Response({"token": token.key})
 
 @api_view(['GET'])
 def api_root(request, format=None):
@@ -40,3 +55,4 @@ def api_root(request, format=None):
         'meetings': reverse('meeting_list', request=request, format=format),
         'users': reverse('user-list', request=request, format=format)
     })
+

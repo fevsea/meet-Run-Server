@@ -1,11 +1,11 @@
-from django.conf.urls import url, include
+from django.conf.urls import url
 from rest_framework.urlpatterns import format_suffix_patterns
-from django.conf.urls import url, include
-from rest_framework import routers
+
 from quedadas import views
 
 urlpatterns = [
     url(r'^$', views.api_root),
+    url(r'^login', views.login),
     url(r'^meetings/$', views.MeetingList.as_view(), name="meeting_list"),
     url(r'^meetings/(?P<pk>[0-9]+)/$', views.MeetingDetail.as_view(), name="meeting_detail"),
     url(r'^users/$', views.UserList.as_view(), name='user-list'),
