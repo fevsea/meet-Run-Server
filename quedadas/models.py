@@ -14,6 +14,7 @@ class Meeting(models.Model):
     level = models.IntegerField(null=True, blank=True)
     latitude = models.CharField(max_length=10, null=False, blank=False)
     longitude = models.CharField(max_length=10,null=False, blank=False)
+    owner = models.ForeignKey('auth.User', related_name='snippets', on_delete=models.CASCADE)
 
     def __str__(self):
         return self.title

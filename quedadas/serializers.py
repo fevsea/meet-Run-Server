@@ -5,9 +5,13 @@ from .models import Meeting
 
 
 class MeetingSerializer(serializers.ModelSerializer):
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+        
     class Meta:
         model = Meeting
         fields = ('id', 'title', 'description', 'public', 'level', 'date', 'latitude', 'longitude')
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:

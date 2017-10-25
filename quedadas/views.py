@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.status import HTTP_401_UNAUTHORIZED
 
+from quedadas.permissions import IsOwnerOrReadOnly
 from .models import Meeting
 from .serializers import UserSerializer, MeetingSerializer, UserSerializerDetail
 
@@ -20,21 +21,27 @@ class MeetingList(generics.ListCreateAPIView):
 class MeetingDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Meeting.objects.all()
     serializer_class = MeetingSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly)
 
 
 class UserList(generics.ListCreateAPIView):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
 
     def perform_create(self, serializer):
         instance = serializer.save()
         instance.set_password(instance.password)
         instance.save()
 
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return UserSerializer
+        return UserSerializerDetail
+
 class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializerDetail
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
 
 
 @api_view(["POST"])
