@@ -8,20 +8,20 @@ from rest_framework.reverse import reverse
 from rest_framework.status import HTTP_401_UNAUTHORIZED
 
 from quedadas.permissions import IsOwnerOrReadOnly
-from .models import Meeting
-from .serializers import UserSerializer, MeetingSerializer, UserSerializerDetail
+from .models import Meeting, Profile
+from .serializers import UserSerializer, MeetingSerializer, UserSerializerDetail, TestSerializer
 
 
 class MeetingList(generics.ListCreateAPIView):
     queryset = Meeting.objects.all()
     serializer_class = MeetingSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    #permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
 
 class MeetingDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Meeting.objects.all()
     serializer_class = MeetingSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly)
+    #permission_classes = (permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly)
 
 
 class UserList(generics.ListCreateAPIView):
@@ -41,7 +41,7 @@ class UserList(generics.ListCreateAPIView):
 class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializerDetail
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
+    #permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
 
 
 @api_view(["POST"])
@@ -63,3 +63,6 @@ def api_root(request, format=None):
         'users': reverse('user-list', request=request, format=format)
     })
 
+class TestList(generics.ListCreateAPIView):
+    queryset = Profile.objects.all()
+    serializer_class = TestSerializer

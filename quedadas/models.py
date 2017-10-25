@@ -21,3 +21,9 @@ class Meeting(models.Model):
 
     class Meta:
         ordering = ('created',)
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='prof')
+    question = models.CharField(max_length=100, blank=False, null=False)
+    answer = models.CharField(max_length=100, blank=False, null=False)
+    postal_code = models.CharField(max_length=5, blank=False, null=False)
