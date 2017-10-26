@@ -6,6 +6,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.status import HTTP_401_UNAUTHORIZED
+from rest_framework.views import APIView
 
 from quedadas.permissions import IsOwnerOrReadOnly
 from .models import Meeting, Profile
@@ -42,6 +43,13 @@ class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializerDetail
     #permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
+
+
+class CurrentUserView(APIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    def get(self, request, format=None):
+        serializer = UserSerializerDetail(request.user)
+        return Response(serializer.data)
 
 
 @api_view(["POST"])
