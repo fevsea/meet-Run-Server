@@ -16,13 +16,13 @@ from .serializers import UserSerializer, MeetingSerializer, UserSerializerDetail
 class MeetingList(generics.ListCreateAPIView):
     queryset = Meeting.objects.all()
     serializer_class = MeetingSerializer
-    #permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
 
 class MeetingDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Meeting.objects.all()
     serializer_class = MeetingSerializer
-    #permission_classes = (permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly)
 
 
 class UserList(generics.ListCreateAPIView):
@@ -42,7 +42,7 @@ class UserList(generics.ListCreateAPIView):
 class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializerDetail
-    #permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
 
 
 class CurrentUserView(APIView):
