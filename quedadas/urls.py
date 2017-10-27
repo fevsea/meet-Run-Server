@@ -5,7 +5,8 @@ from quedadas import views
 
 urlpatterns = [
     url(r'^$', views.api_root),
-    url(r'^login', views.login),
+    url(r'^users/login', views.login),
+    url(r'^users/logout', views.logout),
     url(r'^test/$', views.TestList.as_view(), name="test_list"),
     url(r'^meetings/$', views.MeetingList.as_view(), name="meeting_list"),
     url(r'^meetings/(?P<pk>[0-9]+)/$', views.MeetingDetail.as_view(), name="meeting_detail"),

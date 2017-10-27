@@ -2,10 +2,11 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from rest_framework import generics, permissions
 from rest_framework.authtoken.models import Token
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
-from rest_framework.status import HTTP_401_UNAUTHORIZED
+from rest_framework.status import HTTP_401_UNAUTHORIZED, HTTP_202_ACCEPTED
 from rest_framework.views import APIView
 
 from quedadas.permissions import IsOwnerOrReadOnly
@@ -63,6 +64,16 @@ def login(request):
 
     token, _ = Token.objects.get_or_create(user=user)
     return Response({"token": token.key})
+
+
+@api_view(["GET"])
+@permission_classes((IsAuthenticated, ))
+def logout(request):
+    user = request.user
+    t = Token.objects.get(user=user)
+    t.delete()
+    Token.objects.create(user=user)
+    return Response(status=HTTP_202_ACCEPTED)
 
 @api_view(['GET'])
 def api_root(request, format=None):
