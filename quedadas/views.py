@@ -19,6 +19,9 @@ class MeetingList(generics.ListCreateAPIView):
     serializer_class = MeetingSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
 
 class MeetingDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Meeting.objects.all()
