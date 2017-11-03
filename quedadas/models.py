@@ -34,13 +34,13 @@ class Profile(models.Model):
 
     def get_friends(self):
         user = self.user
-        friends = user.friendship_creator_set.friends  # |  user.friend_set.all()
-        friends.distinct()
+        friends = User.objects.filter(Q(friend_set__creator=user) | Q(friendship_creator_set__friend=user))
+        return friends.distinct()
 
 class Friendship(models.Model):
     created = models.DateTimeField(auto_now_add=True, editable=False)
-    creator = models.ForeignKey(User, related_name="friendship_creator_set")
-    friend = models.ForeignKey(User, related_name="friend_set")
+    creator = models.ForeignKey(User, related_name="friendship_creator_set", null=False)
+    friend = models.ForeignKey(User, related_name="friend_set", null=False)
 
     def __str__(self):
         return self.creator.username + " - " + self.friend.username

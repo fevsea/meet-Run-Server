@@ -3,14 +3,15 @@ from django.contrib.auth.models import User
 from rest_framework import generics, permissions
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
-from rest_framework.status import HTTP_401_UNAUTHORIZED, HTTP_202_ACCEPTED
+from rest_framework.status import HTTP_401_UNAUTHORIZED, HTTP_202_ACCEPTED, HTTP_201_CREATED
 from rest_framework.views import APIView
 
 from quedadas.permissions import IsOwnerOrReadOnly
-from .models import Meeting, Profile
+from .models import Meeting, Profile, Friendship
 from .serializers import UserSerializer, MeetingSerializer, UserSerializerDetail, TestSerializer
 
 
@@ -56,6 +57,7 @@ class CurrentUserView(APIView):
         return Response(serializer.data)
 
 
+
 @api_view(["POST"])
 def login(request):
     username = request.data.get("username")
@@ -68,6 +70,30 @@ def login(request):
     token, _ = Token.objects.get_or_create(user=user)
     return Response({"token": token.key})
 
+
+class Friends(APIView):
+    permission_classes((IsAuthenticated,))
+
+    def get(self, request, pk=None):
+        user = request.user
+        if pk is not None:
+            user = get_object_or_404(User, pk=pk)
+        firends_qs = user.prof.get_friends()
+        serializer = UserSerializerDetail(firends_qs, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, pk=None, format=None):
+        user = request.user
+        friend = get_object_or_404(User, pk=pk)
+        status_code = HTTP_202_ACCEPTED
+        firends_qs = user.prof.get_friends().filter(pk=pk)
+        if (not firends_qs.exists() and pk != user.pk):
+            Friendship(creator=user, friend=friend).save()
+            status_code = HTTP_201_CREATED
+
+        firends_qs = user.prof.get_friends()
+        serializer = UserSerializerDetail(firends_qs, many=True)
+        return Response(serializer.data, status_code)
 
 @api_view(["GET"])
 @permission_classes((IsAuthenticated, ))
