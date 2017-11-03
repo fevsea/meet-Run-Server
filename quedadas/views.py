@@ -30,7 +30,7 @@ class MeetingDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 class UserList(generics.ListCreateAPIView):
-    queryset = User.objects.all()
+    queryset = User.objects.exclude(username="admin")
 
     def perform_create(self, serializer):
         instance = serializer.save()

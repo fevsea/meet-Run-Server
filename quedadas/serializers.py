@@ -4,19 +4,13 @@ from rest_framework import serializers, models
 from .models import Meeting, Profile
 
 
-class MeetingSerializer(serializers.ModelSerializer):
-    def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
-
-    class Meta:
-        model = Meeting
-        fields = ('id', 'title', 'description', 'public', 'level', 'date', 'latitude', 'longitude')
 
 
 class UserSerializer(serializers.ModelSerializer):
     postal_code = serializers.CharField(source='prof.postal_code')
     question = serializers.CharField(source='prof.question')
     answer = serializers.CharField(source='prof.answer')
+    level = serializers.IntegerField(source='prof.level')
 
     def create(self, validated_data):
         profile_data = validated_data.pop('prof')
@@ -27,12 +21,12 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         related_fields = ['prof']
-        fields = ('id', 'username', 'first_name', 'last_name', 'password', 'postal_code', 'question', 'answer')
+        fields = ('id', 'username', 'first_name', 'last_name', 'password', 'postal_code', 'question', 'answer', 'level')
 
 class UserSerializerDetail(serializers.ModelSerializer):
     postal_code = serializers.CharField(source='prof.postal_code')
     question = serializers.CharField(source='prof.question')
-
+    level = serializers.IntegerField(source='prof.level')
 
     def update(self, instance, validated_data):
         profile_data = validated_data.pop('prof')
@@ -48,7 +42,17 @@ class UserSerializerDetail(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'first_name', 'last_name', 'postal_code', 'question')
+        fields = ('id', 'username', 'first_name', 'last_name', 'postal_code', 'question', 'level')
+
+class MeetingSerializer(serializers.ModelSerializer):
+    owner = UserSerializerDetail(many=False, read_only=True)
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
+    class Meta:
+        model = Meeting
+        fields = ('id', 'title', 'description', 'public', 'level', 'date', 'latitude', 'longitude', 'owner')
+
 
 class TestSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username')
