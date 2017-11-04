@@ -7,7 +7,8 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
-from rest_framework.status import HTTP_401_UNAUTHORIZED, HTTP_202_ACCEPTED, HTTP_201_CREATED
+from rest_framework.status import HTTP_401_UNAUTHORIZED, HTTP_202_ACCEPTED, HTTP_201_CREATED, HTTP_204_NO_CONTENT, \
+    HTTP_200_OK
 from rest_framework.views import APIView
 
 from quedadas.permissions import IsOwnerOrReadOnly
@@ -95,6 +96,44 @@ class Friends(APIView):
         serializer = UserSerializerDetail(firends_qs, many=True)
         return Response(serializer.data, status_code)
 
+
+class UserMeeting(APIView):
+    permission_classes((IsAuthenticated,))
+
+    def get(self, request, pk=None):
+        user = request.user
+        if pk is not None:
+            user = get_object_or_404(User, pk=pk)
+        firends_qs = user.meetings_at
+        serializer = MeetingSerializer(firends_qs, many=True)
+        return Response(serializer.data)
+
+class JoinMeeting(APIView):
+    permission_classes((IsAuthenticated,))
+
+    def get(self, request, pk):
+        meeting = get_object_or_404(Meeting, pk=pk)
+        attendences = meeting.participants
+        serializer = UserSerializerDetail(attendences, many=True)
+        return Response(serializer.data)
+        return Response(status=HTTP_200_OK)
+
+    def post(self, request, pk):
+        user = request.user
+        meeting = get_object_or_404(Meeting, pk=pk)
+        status_code = HTTP_204_NO_CONTENT if user in meeting.participants.all() else HTTP_201_CREATED
+        meeting.participants.add(user)
+        meeting.save()
+        return Response(status=status_code)
+
+    def delete(self, request, pk):
+        user = request.user
+        meeting = get_object_or_404(Meeting, pk=pk)
+        status_code = HTTP_200_OK if user in meeting.participants.all() else HTTP_204_NO_CONTENT
+        meeting.participants.remove(user)
+        meeting.save()
+        return Response(status=status_code)
+
 @api_view(["GET"])
 @permission_classes((IsAuthenticated, ))
 def logout(request):
@@ -110,6 +149,9 @@ def api_root(request, format=None):
         'meetings': reverse('meeting_list', request=request, format=format),
         'users': reverse('user-list', request=request, format=format)
     })
+
+
+
 
 class TestList(generics.ListCreateAPIView):
     queryset = Profile.objects.all()
