@@ -1,7 +1,6 @@
 from django.contrib import admin
 
-from .models import Meeting
-
+from .models import Meeting, Friendship
 
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
@@ -25,3 +24,4 @@ admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 
 admin.site.register(Meeting)
+admin.site.register(Friendship)
