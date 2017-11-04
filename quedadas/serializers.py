@@ -34,6 +34,9 @@ class UserSerializerDetail(serializers.ModelSerializer):
         instance.prof.question = profile_data.get('question', instance.prof.question)
         instance.prof.postal_code = profile_data.get('postal_code', instance.prof.postal_code)
         instance.username = validated_data.get('username', instance.username)
+        instance.last_name = validated_data.get('last_name', instance.last_name)
+        instance.first_name = validated_data.get('first_name', instance.first_name)
+        instance.prof.level = profile_data.get('level', instance.prof.level)
         instance.save()
         instance.prof.save()
 
