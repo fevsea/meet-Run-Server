@@ -74,7 +74,7 @@ def login(request):
 
 
 class Friends(APIView):
-    permission_classes((IsAuthenticated,))
+    permission_classes((IsAuthenticated, ))
 
     def get(self, request, pk=None):
         user = request.user
