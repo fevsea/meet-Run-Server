@@ -8,6 +8,7 @@ from .models import Meeting
 
 
 class MeetingsTests(APITestCase):
+    @unittest.skip("demonstrating skipping")
     def test_create_meeting(self):
         """
         Ensure we can create a new meeting object.
