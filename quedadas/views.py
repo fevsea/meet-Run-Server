@@ -1,5 +1,6 @@
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
+from django.db.models import Q
 from rest_framework import generics, permissions
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
@@ -102,8 +103,8 @@ class Friends(APIView):
         status_code = HTTP_204_NO_CONTENT
         firends_qs = user.prof.get_friends().filter(pk=pk)
         if (firends_qs.exists() and pk != user.pk):
-            Friendship(creator=user, friend=friend).save()
-
+            Friendship.objects.filter(Q(creator=user, friend=friend) | Q(friend=user, creator=friend)).delete()
+            status_code = HTTP_200_OK
         firends_qs = user.prof.get_friends()
         serializer = UserSerializerDetail(firends_qs, many=True)
         return Response(serializer.data, status_code)
