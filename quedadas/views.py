@@ -96,6 +96,19 @@ class Friends(APIView):
         serializer = UserSerializerDetail(firends_qs, many=True)
         return Response(serializer.data, status_code)
 
+    def delete(self, request, pk=None, format=None):
+        user = request.user
+        friend = get_object_or_404(User, pk=pk)
+        status_code = HTTP_204_NO_CONTENT
+        firends_qs = user.prof.get_friends().filter(pk=pk)
+        if (firends_qs.exists() and pk != user.pk):
+            Friendship(creator=user, friend=friend).save()
+
+        firends_qs = user.prof.get_friends()
+        serializer = UserSerializerDetail(firends_qs, many=True)
+        return Response(serializer.data, status_code)
+
+
 
 class UserMeeting(APIView):
     permission_classes((IsAuthenticated,))

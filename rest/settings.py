@@ -132,3 +132,5 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     )
 }
+
+APPEND_SLASH = True
