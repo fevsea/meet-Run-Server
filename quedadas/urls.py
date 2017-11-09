@@ -14,6 +14,7 @@ urlpatterns = [
     url(r'^users$', views.UserList.as_view(), name='user-list'),
     url(r'^users/(?P<pk>[0-9]+)$', views.UserDetail.as_view(), name='user-detail'),
     url(r'^users/(?P<pk>[0-9]+)/meetings$', views.UserMeeting.as_view(), name='user-meetings-pk'),
+    url(r'^users/changePassword', views.changePassword.as_view(), name='change-password'),
     url(r'^users/meetings$', views.UserMeeting.as_view(), name='user-meetings'),
     url(r'^users/(?P<pk>[0-9]+)/friends$', views.Friends.as_view(), name='priends-pk'),
     url(r'^users/friends$', views.Friends.as_view(), name='firends'),

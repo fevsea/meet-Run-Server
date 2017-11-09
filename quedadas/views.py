@@ -1,3 +1,4 @@
+from datetime import date
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.db.models import Q
@@ -9,16 +10,16 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.status import HTTP_401_UNAUTHORIZED, HTTP_202_ACCEPTED, HTTP_201_CREATED, HTTP_204_NO_CONTENT, \
-    HTTP_200_OK
+    HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN
 from rest_framework.views import APIView
 
 from quedadas.permissions import IsOwnerOrReadOnly
 from .models import Meeting, Profile, Friendship
-from .serializers import UserSerializer, MeetingSerializer, UserSerializerDetail, TestSerializer
+from .serializers import UserSerializer, MeetingSerializer, UserSerializerDetail, TestSerializer, ChangePassword
 
 
 class MeetingList(generics.ListCreateAPIView):
-    queryset = Meeting.objects.all()
+    queryset = Meeting.objects.all().order_by("date")
     serializer_class = MeetingSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     filter_backends = (filters.SearchFilter,)
@@ -77,7 +78,7 @@ def login(request):
 
 
 class Friends(APIView):
-    permission_classes((IsAuthenticated, ))
+    permission_classes = ((IsAuthenticated, ))
 
     def get(self, request, pk=None):
         user = request.user
@@ -120,7 +121,7 @@ class UserMeeting(generics.ListAPIView):
         user = self.request.user
         if pk is not None:
             user = get_object_or_404(User, pk=pk)
-        return user.meetings_at
+        return (user.meetings_at.all() | user.meetings.all()).distinct().filter(date__gt=date.today()).order_by("date")
 
     serializer_class = MeetingSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
@@ -128,14 +129,13 @@ class UserMeeting(generics.ListAPIView):
     search_fields = ('title', 'description')
 
 class JoinMeeting(APIView):
-    permission_classes((IsAuthenticated,))
+    permission_classes = ((IsAuthenticated,))
 
     def get(self, request, pk):
         meeting = get_object_or_404(Meeting, pk=pk)
         attendences = meeting.participants
         serializer = UserSerializerDetail(attendences, many=True)
         return Response(serializer.data)
-        return Response(status=HTTP_200_OK)
 
     def post(self, request, pk):
         user = request.user
@@ -152,6 +152,23 @@ class JoinMeeting(APIView):
         meeting.participants.remove(user)
         meeting.save()
         return Response(status=status_code)
+
+
+class changePassword(APIView):
+    permission_classes = (IsAuthenticated,)
+    def post(self, request, format=None):
+        serializer = ChangePassword(data=request.data)
+        if serializer.is_valid():
+            user = self.request.user
+            if not user.check_password(serializer["old"].value):
+                return Response(status=HTTP_403_FORBIDDEN)
+            user.set_password(serializer["new"].value)
+            user.save()
+            return Response(status=HTTP_200_OK)
+        else:
+            return Response(status=HTTP_400_BAD_REQUEST)
+
+
 
 @api_view(["GET"])
 @permission_classes((IsAuthenticated, ))
