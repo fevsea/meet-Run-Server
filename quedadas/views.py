@@ -114,16 +114,18 @@ class Friends(APIView):
 
 
 
-class UserMeeting(APIView):
-    permission_classes((IsAuthenticated,))
-
-    def get(self, request, pk=None):
-        user = request.user
+class UserMeeting(generics.ListAPIView):
+    def get_queryset(self):
+        pk = self.kwargs.get('pk', None)
+        user = self.request.user
         if pk is not None:
             user = get_object_or_404(User, pk=pk)
-        firends_qs = user.meetings_at
-        serializer = MeetingSerializer(firends_qs, many=True)
-        return Response(serializer.data)
+        return user.meetings_at
+
+    serializer_class = MeetingSerializer
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    filter_backends = (filters.SearchFilter,)
+    search_fields = ('title', 'description')
 
 class JoinMeeting(APIView):
     permission_classes((IsAuthenticated,))
