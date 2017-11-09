@@ -60,6 +60,12 @@ class MeetingSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'description', 'public', 'level', 'date', 'latitude', 'longitude', 'owner', 'participants')
 
 
+
+class ChangePassword(serializers.Serializer):
+    old = serializers.CharField(required=True)
+    new = serializers.CharField(required=True)
+
+
 class TestSerializer(serializers.ModelSerializer):
     username = serializers.CharField(source='user.username')
     class Meta:
