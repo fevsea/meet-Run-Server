@@ -23,7 +23,14 @@ class UserAdmin(BaseUserAdmin):
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 
+# Define a new User admin
+class RouteAdminInline(admin.TabularInline):
+    model = RoutePoint
+
+class TrackingPoint(admin.ModelAdmin):
+    inlines = (RouteAdminInline, )
+
+admin.site.register(Tracking, TrackingPoint)
+
 admin.site.register(Meeting)
 admin.site.register(Friendship)
-admin.site.register(Tracking)
-admin.site.register(RoutePoint)

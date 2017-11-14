@@ -16,10 +16,9 @@ class Tracking(models.Model):
     calories = models.FloatField()
 
 class RoutePoint(models.Model):
-    order = models.IntegerField()
     latitude = models.FloatField()
     longitude = models.FloatField()
-    track = models.ForeignKey(Tracking, related_name="routePoints", null=False)
+    track = models.ForeignKey(Tracking, related_name="routePoints", null=False, on_delete=models.CASCADE)
 
 
 class Meeting(models.Model):
@@ -33,7 +32,7 @@ class Meeting(models.Model):
     longitude = models.CharField(max_length=10,null=False, blank=False)
     owner = models.ForeignKey('auth.User', related_name='meetings', on_delete=models.CASCADE)
     participants = models.ManyToManyField(User, related_name='meetings_at')
-    tracking = models.ForeignKey(Tracking, related_name="meeting", null=True)
+    tracking = models.ForeignKey(Tracking, related_name="meeting", null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return self.title
@@ -56,8 +55,8 @@ class Profile(models.Model):
 
 class Friendship(models.Model):
     created = models.DateTimeField(auto_now_add=True, editable=False)
-    creator = models.ForeignKey(User, related_name="friendship_creator_set", null=False)
-    friend = models.ForeignKey(User, related_name="friend_set", null=False)
+    creator = models.ForeignKey(User, related_name="friendship_creator_set", null=False, on_delete=models.CASCADE)
+    friend = models.ForeignKey(User, related_name="friend_set", null=False, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.creator.username + " - " + self.friend.username
