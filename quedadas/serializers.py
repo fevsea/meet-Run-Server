@@ -3,9 +3,7 @@ from rest_framework import serializers, models
 
 
 
-from .models import Meeting, Profile
-
-
+from .models import Meeting, Profile, Tracking
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -71,3 +69,8 @@ class TestSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = ('id', 'username', 'postal_code')
+
+class TrackingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Tracking
+        fields = ('id', 'averagespeed', 'distance', 'steps', 'totalTimeMillis', 'calories')

@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Meeting, Friendship
+from .models import Meeting, Friendship, Tracking, RoutePoint
 
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
@@ -25,3 +25,5 @@ admin.site.register(User, UserAdmin)
 
 admin.site.register(Meeting)
 admin.site.register(Friendship)
+admin.site.register(Tracking)
+admin.site.register(RoutePoint)

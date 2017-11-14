@@ -2,7 +2,7 @@ from datetime import date
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.db.models import Q
-from rest_framework import generics, permissions, filters
+from rest_framework import generics, permissions, filters, viewsets
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.generics import get_object_or_404
@@ -15,7 +15,8 @@ from rest_framework.views import APIView
 
 from quedadas.permissions import IsOwnerOrReadOnly
 from .models import Meeting, Profile, Friendship
-from .serializers import UserSerializer, MeetingSerializer, UserSerializerDetail, TestSerializer, ChangePassword
+from .serializers import UserSerializer, MeetingSerializer, UserSerializerDetail, TestSerializer, ChangePassword, \
+    TrackingSerializer
 
 
 class MeetingList(generics.ListCreateAPIView):
@@ -34,6 +35,15 @@ class MeetingDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Meeting.objects.all()
     serializer_class = MeetingSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly)
+
+class Tracking(APIView):
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
+
+    def get(self, request, pk):
+        pass
+        m = get_object_or_404(Meeting, pk=pk).tracking
+        serializer = TrackingSerializer(m)
+        return Response(serializer.data)
 
 
 class UserList(generics.ListCreateAPIView):
