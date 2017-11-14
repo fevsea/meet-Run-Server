@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Meeting, Friendship
+from .models import Meeting, Friendship, Tracking, RoutePoint
 
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
@@ -22,6 +22,15 @@ class UserAdmin(BaseUserAdmin):
 # Re-register UserAdmin
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
+
+# Define a new User admin
+class RouteAdminInline(admin.TabularInline):
+    model = RoutePoint
+
+class TrackingPoint(admin.ModelAdmin):
+    inlines = (RouteAdminInline, )
+
+admin.site.register(Tracking, TrackingPoint)
 
 admin.site.register(Meeting)
 admin.site.register(Friendship)

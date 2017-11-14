@@ -2,7 +2,7 @@ from datetime import date
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.db.models import Q
-from rest_framework import generics, permissions, filters
+from rest_framework import generics, permissions, filters, viewsets, status
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.generics import get_object_or_404
@@ -12,10 +12,12 @@ from rest_framework.reverse import reverse
 from rest_framework.status import HTTP_401_UNAUTHORIZED, HTTP_202_ACCEPTED, HTTP_201_CREATED, HTTP_204_NO_CONTENT, \
     HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_403_FORBIDDEN
 from rest_framework.views import APIView
+from rest_framework import mixins
 
 from quedadas.permissions import IsOwnerOrReadOnly
-from .models import Meeting, Profile, Friendship
-from .serializers import UserSerializer, MeetingSerializer, UserSerializerDetail, TestSerializer, ChangePassword
+from .models import Meeting, Profile, Friendship, Tracking
+from .serializers import UserSerializer, MeetingSerializer, UserSerializerDetail, TestSerializer, ChangePassword, \
+    TrackingSerializer
 
 
 class MeetingList(generics.ListCreateAPIView):
@@ -35,6 +37,33 @@ class MeetingDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = MeetingSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly)
 
+class TrackingView(mixins.CreateModelMixin,
+               mixins.DestroyModelMixin,
+               mixins.RetrieveModelMixin,
+               generics.GenericAPIView):
+
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
+    serializer_class = TrackingSerializer
+    queryset = Tracking.objects.all()
+
+    def get(self, request, *args, **kwargs):
+        return self.retrieve(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
+
+    def post(self, request, pk, format=None):
+        if Tracking.objects.filter(pk=pk).exists():
+            return Response(status=status.HTTP_409_CONFLICT)
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid():
+            serializer.validated_data.update({'id': pk})
+            m = get_object_or_404(Meeting, pk=pk)
+            serializer.save()
+            m.tracking_id = pk
+            m.save()
+            return Response(serializer.data, status=HTTP_201_CREATED)
+        return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
 class UserList(generics.ListCreateAPIView):
     queryset = User.objects.exclude(username="admin")
