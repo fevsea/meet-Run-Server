@@ -8,7 +8,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ('quedadas', '0004_auto_20171024_1708'),
@@ -22,7 +21,8 @@ class Migration(migrations.Migration):
                 ('postal_code', models.IntegerField(blank=True)),
                 ('rec_question', models.CharField(blank=True, max_length=30)),
                 ('rec_answer', models.DateField(blank=True, null=True)),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                'user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
         ),
     ]

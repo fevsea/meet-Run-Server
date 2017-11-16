@@ -7,19 +7,6 @@ from django.db import models
 from django.db.models.query_utils import Q
 
 
-class Tracking(models.Model):
-    created = models.DateTimeField(auto_now_add=True)
-    averagespeed = models.FloatField()
-    distance = models.FloatField()
-    steps = models.IntegerField()
-    totalTimeMillis = models.IntegerField()
-    calories = models.FloatField()
-
-class RoutePoint(models.Model):
-    latitude = models.FloatField()
-    longitude = models.FloatField()
-    track = models.ForeignKey(Tracking, related_name="routePoints", null=False, on_delete=models.CASCADE)
-
 
 class Meeting(models.Model):
     created = models.DateTimeField(auto_now_add=True)
@@ -32,7 +19,6 @@ class Meeting(models.Model):
     longitude = models.CharField(max_length=10,null=False, blank=False)
     owner = models.ForeignKey('auth.User', related_name='meetings', on_delete=models.CASCADE)
     participants = models.ManyToManyField(User, related_name='meetings_at')
-    tracking = models.ForeignKey(Tracking, related_name="meeting", null=True, on_delete=models.SET_NULL)
 
     def __str__(self):
         return self.title
@@ -60,3 +46,20 @@ class Friendship(models.Model):
 
     def __str__(self):
         return self.creator.username + " - " + self.friend.username
+
+
+class Tracking(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    averagespeed = models.FloatField()
+    distance = models.FloatField()
+    steps = models.IntegerField()
+    totalTimeMillis = models.IntegerField()
+    calories = models.FloatField()
+    meeting = models.ForeignKey(Meeting, related_name="tracks", null=False, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name="tracks", null=False, on_delete=models.CASCADE)
+
+
+class RoutePoint(models.Model):
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    track = models.ForeignKey(Tracking, related_name="routePoints", null=False, on_delete=models.CASCADE)

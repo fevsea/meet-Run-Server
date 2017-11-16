@@ -1,7 +1,5 @@
 from django.contrib.auth.models import User
-from rest_framework import serializers, models
-
-
+from rest_framework import serializers
 
 from .models import Meeting, Profile, Tracking, RoutePoint
 
@@ -23,6 +21,7 @@ class UserSerializer(serializers.ModelSerializer):
         related_fields = ['prof']
         fields = ('id', 'username', 'first_name', 'last_name', 'password', 'postal_code', 'question', 'answer', 'level')
 
+
 class UserSerializerDetail(serializers.ModelSerializer):
     postal_code = serializers.CharField(source='prof.postal_code')
     question = serializers.CharField(source='prof.question')
@@ -40,16 +39,17 @@ class UserSerializerDetail(serializers.ModelSerializer):
         instance.save()
         instance.prof.save()
 
-
         return instance
 
     class Meta:
         model = User
         fields = ('id', 'username', 'first_name', 'last_name', 'postal_code', 'question', 'level')
 
+
 class MeetingSerializer(serializers.ModelSerializer):
     owner = UserSerializerDetail(many=False, read_only=True)
     participants = UserSerializerDetail(many=True, read_only=True)
+
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
@@ -58,18 +58,9 @@ class MeetingSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'description', 'public', 'level', 'date', 'latitude', 'longitude', 'owner', 'participants')
 
 
-
 class ChangePassword(serializers.Serializer):
     old = serializers.CharField(required=True)
     new = serializers.CharField(required=True)
-
-
-class TestSerializer(serializers.ModelSerializer):
-    username = serializers.CharField(source='user.username')
-    class Meta:
-        model = Profile
-        fields = ('id', 'username', 'postal_code')
-
 
 
 class PointSerializer(serializers.ModelSerializer):
@@ -77,11 +68,14 @@ class PointSerializer(serializers.ModelSerializer):
         model = RoutePoint
         fields = ('latitude', 'longitude')
 
+
 class TrackingSerializer(serializers.ModelSerializer):
     routePoints = PointSerializer(many=True, write_only=False)
+
     class Meta:
         model = Tracking
-        fields = ('id', 'averagespeed', 'distance', 'steps', 'totalTimeMillis', 'calories', 'routePoints')
+        read_only_fields = ('user', 'meeting')
+        fields = ('user', 'meeting', 'averagespeed', 'distance', 'steps', 'totalTimeMillis', 'calories', 'routePoints')
 
     def create(self, validated_data):
         points_data = validated_data.pop('routePoints')

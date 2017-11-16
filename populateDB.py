@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
-import os, django
-
+import django
+import os
 from datetime import datetime, timedelta
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "rest.settings")
 django.setup()
 from quedadas.models import Meeting, Profile, Friendship
 from django.contrib.auth.models import User
-from rest_framework.authtoken.models import Token
 
 User.objects.create_superuser('admin', 'admin@example.com', 'meetnrun')
 

@@ -6,7 +6,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
         ('quedadas', '0014_auto_20171114_1018'),
     ]
