@@ -55,8 +55,7 @@ class MeetingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Meeting
-        fields = (
-        'id', 'title', 'description', 'public', 'level', 'date', 'latitude', 'longitude', 'owner', 'participants')
+        fields = ('id', 'title', 'description', 'public', 'level', 'date', 'latitude', 'longitude', 'owner', 'participants')
 
 
 class ChangePassword(serializers.Serializer):
@@ -75,7 +74,8 @@ class TrackingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Tracking
-        fields = ('id', 'averagespeed', 'distance', 'steps', 'totalTimeMillis', 'calories', 'routePoints')
+        read_only_fields = ('user', 'meeting')
+        fields = ('user', 'meeting', 'averagespeed', 'distance', 'steps', 'totalTimeMillis', 'calories', 'routePoints')
 
     def create(self, validated_data):
         points_data = validated_data.pop('routePoints')

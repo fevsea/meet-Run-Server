@@ -1,4 +1,5 @@
 from datetime import date
+from functools import reduce
 
 from django.contrib.auth.models import User
 from rest_framework import generics, permissions, filters, mixins, status
@@ -7,6 +8,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_204_NO_CONTENT, HTTP_200_OK
 from rest_framework.views import APIView
+from django.db.models import Q
+import operator
 
 from quedadas.models import Meeting, Tracking
 from quedadas.permissions import IsOwnerOrReadOnly
@@ -37,6 +40,16 @@ class TrackingView(mixins.CreateModelMixin,
     permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
     serializer_class = TrackingSerializer
     queryset = Tracking.objects.all()
+    lookup_fields = ('meeting', 'user')
+
+    def get_object(self):
+        queryset = self.get_queryset()  # Get the base queryset
+        queryset = self.filter_queryset(queryset)  # Apply any filter backends
+        filter = {}
+        for field in self.lookup_fields:
+            filter[field] = self.kwargs[field]
+        q = reduce(operator.and_, (Q(x) for x in filter.items()))
+        return get_object_or_404(queryset, q)
 
     def get(self, request, *args, **kwargs):
         return self.retrieve(request, *args, **kwargs)
@@ -44,16 +57,16 @@ class TrackingView(mixins.CreateModelMixin,
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
 
-    def post(self, request, pk, format=None):
-        if Tracking.objects.filter(pk=pk).exists():
+    def post(self, request, meeting, user, format=None):
+        if Tracking.objects.filter(user=user).filter(meeting=meeting).exists():
             return Response(status=status.HTTP_409_CONFLICT)
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            serializer.validated_data.update({'id': pk})
-            m = get_object_or_404(Meeting, pk=pk)
+            serializer.validated_data.update({
+                'user': get_object_or_404(User, pk=user),
+                'meeting' : get_object_or_404(Meeting, pk=meeting)
+            })
             serializer.save()
-            m.tracking_id = pk
-            m.save()
             return Response(serializer.data, status=HTTP_201_CREATED)
         return Response(serializer.errors, status=HTTP_400_BAD_REQUEST)
 
