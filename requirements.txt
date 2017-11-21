@@ -2,3 +2,4 @@ django
 djangorestframework
 coreapi
 django-filter
+drf_openapi

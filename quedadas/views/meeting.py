@@ -83,6 +83,7 @@ class UserMeeting(generics.ListAPIView):
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('title', 'description')
+    pagination_class = None
 
 
 class JoinMeeting(APIView):

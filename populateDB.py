@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import django
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+from django.utils import timezone
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "rest.settings")
 django.setup()
@@ -33,15 +34,15 @@ Friendship(creator=userD, friend=userA).save()
 Friendship(creator=userE, friend=userF).save()
 Friendship(creator=userE, friend=userG).save()
 
-meetingA = Meeting(owner=userA, title="Sortida pel marenostrum", public=True, level=3, latitude="42.2N",
-        longitude="2.03S", date=(datetime.now()+timedelta(days=2)))
+meetingA = Meeting(owner=userA, title="Sortida pel marenostrum", public=True, level=3, latitude="41.488576",
+        longitude="2.21284", date=(timezone.now()+timedelta(days=2)))
 meetingA.save()
 meetingA.participants.add(userB)
 
-meetingB = Meeting(owner=userA, title="Guanta", public=True, level=2, latitude="41.2N",
-        longitude="2.43S", date=(datetime.now()+timedelta(days=3)))
+meetingB = Meeting(owner=userA, title="Guanta", public=True, level=2, latitude="41.388576",
+        longitude="2.11284", date=(timezone.now()+timedelta(days=3)))
 meetingA.save()
 meetingA.participants.add(userB, userC, userD, userE, userF)
 
-meetingC = Meeting(owner=userB, title="N'em a corre per l'eixample", public=False, level=1, latitude="42.2N",
-        longitude="2.03S", date=(datetime.now()+timedelta(days=2))).save()
+meetingC = Meeting(owner=userB, title="N'em a corre per l'eixample", public=False, level=1, latitude="41.378576",
+        longitude="2.01284", date=(timezone.now()+timedelta(days=2))).save()
