@@ -6,7 +6,7 @@ from quedadas.views import views, user, meeting
 urlpatterns = [
     # Views views
     url(r'^$', views.api_root),
-
+  
     # View meetings
     url(r'^meetings$', meeting.MeetingList.as_view(), name="meeting_list"),
     url(r'^meetings/(?P<pk>[0-9]+)$', meeting.MeetingDetail.as_view(), name="meeting_detail"),
@@ -25,7 +25,6 @@ urlpatterns = [
     url(r'^users/friends$', user.Friends.as_view(), name='firends'),
     url(r'^users/friends/(?P<pk>[0-9]+)$', user.Friends.as_view(), name='add-firends'),
     url(r'^users/(?P<pk>[0-9]+)/friends$', user.Friends.as_view(), name='priends-pk'),
-
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
