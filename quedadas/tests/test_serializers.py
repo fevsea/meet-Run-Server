@@ -1,4 +1,6 @@
 # coding=utf-8
+import unittest
+
 from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.authtoken.models import Token
@@ -14,6 +16,7 @@ class UserTests(APITestCase):
     def setUp(self):
         populate()
 
+    @unittest.skip("demonstrating skipping")
     def test_serialize_one_user(self):
         """
         Serialization of one user

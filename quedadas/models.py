@@ -69,8 +69,11 @@ class Chat(models.Model):
     chatName = models.TextField(null=False, unique=True)
     userName = models.ForeignKey(User, null=False, related_name='chatA')
     friendUsername = models.ForeignKey(User, null=False, related_name='chatB')
-    last_message = models.DateTimeField(null=True)
-    last_hour = models.CharField(max_length=30)
+    last_message = models.TextField(null=False)
+    last_time = models.DateTimeField(null=True)
+    username_message = models.BooleanField(null=False, default=True)
+    last_hour = models.CharField(max_length=30, null=False)
+
 
 
     class Meta:

@@ -90,9 +90,9 @@ class ChatSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Chat
-        fields = ('pk', 'chatName', 'userName', 'friendUsername', 'last_message', 'last_hour' )
+        fields = ('pk', 'chatName', 'userName', 'friendUsername', 'last_message', 'last_time', 'username_message', 'last_hour' )
 
 class ChatSerializerCreate(serializers.ModelSerializer):
      class Meta:
         model = Chat
-        fields = ('chatName', 'userName', 'friendUsername', 'last_message', 'last_hour' )
+        fields = ('chatName', 'userName', 'friendUsername', 'last_message', 'last_time', 'username_message', 'last_hour' )
