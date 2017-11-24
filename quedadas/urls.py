@@ -1,7 +1,7 @@
 from django.conf.urls import url
 from rest_framework.urlpatterns import format_suffix_patterns
 
-from quedadas.views import views, user, meeting
+from quedadas.views import views, user, meeting, chats
 
 urlpatterns = [
     # Views views
@@ -19,12 +19,18 @@ urlpatterns = [
     url(r'^users$', user.UserList.as_view(), name='user-list'),
     url(r'^users/(?P<pk>[0-9]+)$', user.UserDetail.as_view(), name='user-detail'),
     url(r'^users/current$', user.CurrentUserView.as_view(), name='current-user'),
-    url(r'^users/login', user.login),
-    url(r'^users/logout', user.logout),
-    url(r'^users/changePassword', user.changePassword.as_view(), name='change-password'),
+    url(r'^users/login$', user.login),
+    url(r'^users/logout$', user.logout),
+    url(r'^users/changePassword$', user.changePassword.as_view(), name='change-password'),
     url(r'^users/friends$', user.Friends.as_view(), name='firends'),
     url(r'^users/friends/(?P<pk>[0-9]+)$', user.Friends.as_view(), name='add-firends'),
     url(r'^users/(?P<pk>[0-9]+)/friends$', user.Friends.as_view(), name='priends-pk'),
+
+    # Chats
+    url(r'^chats$', chats.ChatList.as_view(), name='chat-list'),
+    url(r'^chats/(?P<pk>[0-9]+)$', chats.ChatDetail.as_view(), name='chat-detail'),
+
+
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

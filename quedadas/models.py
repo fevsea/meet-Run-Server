@@ -63,3 +63,15 @@ class RoutePoint(models.Model):
     latitude = models.FloatField()
     longitude = models.FloatField()
     track = models.ForeignKey(Tracking, related_name="routePoints", null=False, on_delete=models.CASCADE)
+
+
+class Chat(models.Model):
+    chatName = models.TextField(null=False, unique=True)
+    userName = models.ForeignKey(User, null=False, related_name='chatA')
+    friendUsername = models.ForeignKey(User, null=False, related_name='chatB')
+    last_message = models.DateTimeField(null=True)
+    last_hour = models.CharField(max_length=30)
+
+
+    class Meta:
+        unique_together = ('userName', 'friendUsername')
