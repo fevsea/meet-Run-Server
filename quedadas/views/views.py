@@ -11,6 +11,7 @@ def api_root(request, format=None):
         'meetings': reverse('meeting_list', request=request, format=format),
         'users': reverse('user-list', request=request, format=format),
         'chats': reverse('chat-list', request=request, format=format),
+        'challenges': reverse('challenge-list', request=request, format=format),
         'admin': ''.join(['http://', get_current_site(request).domain, "/admin"]),
         'docs': reverse('docs', request=request, format=format),
     })
