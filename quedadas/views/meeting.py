@@ -78,7 +78,17 @@ class UserMeeting(generics.ListAPIView):
         user = self.request.user
         if pk is not None:
             user = get_object_or_404(User, pk=pk)
-        return (user.meetings_at.all() | user.meetings.all()).distinct().filter(date__gt=date.today()).order_by("date")
+
+        qs = (user.meetings_at.all() | user.meetings.all()).distinct()
+        filt = self.request.query_params.get('filter', None)
+
+        if filter is None or filter == "all":
+            pass
+        elif filt == "past":
+            qs = qs.filter(date__lt=date.today())
+        elif filt == "future":
+            qs = qs.filter(date__gte=date.today())
+        return qs.order_by("date")
 
     serializer_class = MeetingSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
