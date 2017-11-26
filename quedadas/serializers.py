@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from .models import Meeting, Profile, Tracking, RoutePoint, Chat
+from .models import Meeting, Profile, Tracking, RoutePoint, Chat, Statistics
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -96,3 +96,17 @@ class ChatSerializerCreate(serializers.ModelSerializer):
      class Meta:
         model = Chat
         fields = ('chatName', 'userName', 'friendUsername', 'last_message', 'last_time', 'username_message', 'last_hour' )
+
+class TrackingSerializerNoPoints(serializers.ModelSerializer):
+    class Meta:
+        model = Tracking
+        fields = ('user', 'meeting', 'averagespeed', 'distance', 'steps', 'totalTimeMillis', 'calories')
+
+
+class StatsSerializer(serializers.ModelSerializer):
+    lastTracking = TrackingSerializerNoPoints(many=False, read_only=True)
+    class Meta:
+        model = Statistics
+        fields = (
+        'distance', 'steps', 'totalTimeMillis', 'calories', 'meetingsCompletats', 'averagespeed', 'lastTracking')
+
