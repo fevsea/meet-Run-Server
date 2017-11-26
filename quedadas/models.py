@@ -120,5 +120,3 @@ def init_statistics(sender, instance, **kwargs):
         statistic.save()
         instance.statistics = statistic
         instance.save()
-
-
