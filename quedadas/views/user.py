@@ -10,6 +10,7 @@ from rest_framework.response import Response
 from rest_framework.status import HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN, HTTP_200_OK, HTTP_400_BAD_REQUEST, \
     HTTP_202_ACCEPTED, HTTP_201_CREATED, HTTP_204_NO_CONTENT
 from rest_framework.views import APIView
+from rest_framework.settings import api_settings
 
 from quedadas.models import Friendship
 from quedadas.permissions import IsOwnerOrReadOnly
@@ -85,13 +86,19 @@ def logout(request):
 
 class Friends(APIView):
     permission_classes = ((IsAuthenticated,))
+    pagination_class = api_settings.DEFAULT_PAGINATION_CLASS
 
     def get(self, request, pk=None):
         user = request.user
         if pk is not None:
             user = get_object_or_404(User, pk=pk)
-        firends_qs = user.prof.get_friends()
-        serializer = UserSerializerDetail(firends_qs, many=True)
+        friends_qs = user.prof.get_friends()
+        page = self.paginate_queryset(friends_qs)
+        if page is not None:
+            serializer = UserSerializerDetail(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = UserSerializerDetail(friends_qs, many=True)
         return Response(serializer.data)
 
     def post(self, request, pk=None, format=None):
@@ -118,3 +125,30 @@ class Friends(APIView):
         firends_qs = user.prof.get_friends()
         serializer = UserSerializerDetail(firends_qs, many=True)
         return Response(serializer.data, status_code)
+
+    @property
+    def paginator(self):
+        """
+        The paginator instance associated with the view, or `None`.
+        """
+        if not hasattr(self, '_paginator'):
+            if self.pagination_class is None:
+                self._paginator = None
+            else:
+                self._paginator = self.pagination_class()
+        return self._paginator
+
+    def paginate_queryset(self, queryset):
+        """
+        Return a single page of results, or `None` if pagination is disabled.
+        """
+        if self.paginator is None:
+            return None
+        return self.paginator.paginate_queryset(queryset, self.request, view=self)
+
+    def get_paginated_response(self, data):
+        """
+        Return a paginated style `Response` object for the given output data.
+        """
+        assert self.paginator is not None
+        return self.paginator.get_paginated_response(data)
