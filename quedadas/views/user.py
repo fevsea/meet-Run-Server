@@ -14,7 +14,7 @@ from rest_framework.settings import api_settings
 
 from quedadas.models import Friendship
 from quedadas.permissions import IsOwnerOrReadOnly
-from quedadas.serializers import UserSerializer, UserSerializerDetail, ChangePassword
+from quedadas.serializers import UserSerializer, UserSerializerDetail, ChangePassword, StatsSerializer
 
 
 class UserList(generics.ListCreateAPIView):
@@ -152,3 +152,12 @@ class Friends(APIView):
         """
         assert self.paginator is not None
         return self.paginator.get_paginated_response(data)
+
+class Stats(APIView):
+    permission_classes = ((IsAuthenticated,))
+    def get(self, request, pk=None):
+        user = request.user
+        if pk is not None:
+            user = get_object_or_404(User, pk=pk)
+        serializer = StatsSerializer(user.prof.statistics, many=False)
+        return Response(serializer.data)

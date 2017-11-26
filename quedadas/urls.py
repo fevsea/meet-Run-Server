@@ -25,6 +25,8 @@ urlpatterns = [
     url(r'^users/friends$', user.Friends.as_view(), name='firends'),
     url(r'^users/friends/(?P<pk>[0-9]+)$', user.Friends.as_view(), name='add-firends'),
     url(r'^users/(?P<pk>[0-9]+)/friends$', user.Friends.as_view(), name='priends-pk'),
+    url(r'^users/statistics$', user.Stats.as_view(), name='statistics'),
+    url(r'^users/(?P<pk>[0-9]+)/statistics$', user.Stats.as_view(), name='statistics-pk'),
 
     # Chats
     url(r'^chats$', chats.ChatList.as_view(), name='chat-list'),
