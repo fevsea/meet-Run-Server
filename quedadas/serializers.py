@@ -48,14 +48,14 @@ class UserSerializerDetail(serializers.ModelSerializer):
 
 class MeetingSerializer(serializers.ModelSerializer):
     owner = UserSerializerDetail(many=False, read_only=True)
-    participants = UserSerializerDetail(many=True, read_only=True)
+    #participants = UserSerializerDetail(many=True, read_only=True)
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
     class Meta:
         model = Meeting
-        fields = ('id', 'title', 'description', 'public', 'level', 'date', 'latitude', 'longitude', 'owner', 'participants')
+        fields = ('id', 'title', 'description', 'public', 'level', 'date', 'latitude', 'longitude', 'owner')
 
 
 class ChangePassword(serializers.Serializer):
