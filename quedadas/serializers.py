@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from .models import Meeting, Profile, Tracking, RoutePoint, Chat, Statistics
+from .models import Meeting, Profile, Tracking, RoutePoint, Chat, Statistics, Challenge
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -110,3 +110,7 @@ class StatsSerializer(serializers.ModelSerializer):
         fields = (
         'distance', 'steps', 'totalTimeMillis', 'calories', 'meetingsCompletats', 'averagespeed', 'lastTracking')
 
+class ChallengeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Challenge
+        fields = ('id', 'creator', 'challenged', 'distance', 'created', 'deadline', 'creatorDistance', 'challengedDistance')

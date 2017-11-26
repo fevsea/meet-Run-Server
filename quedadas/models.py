@@ -120,3 +120,31 @@ def init_statistics(sender, instance, **kwargs):
         statistic.save()
         instance.statistics = statistic
         instance.save()
+
+
+class Challenge(models.Model):
+    creator = models.ForeignKey(User, related_name="challenge_creator", null=False)
+    challenged = models.ForeignKey(User, related_name="challenged", null=False)
+    distance = models.IntegerField(null=False)
+    created = models.DateTimeField(auto_now_add=True)
+    deadline = models.DateTimeField()
+    creatorBase = models.FloatField(null=True)
+    challengedBase = models.FloatField(null=True)
+
+    @property
+    def creatorDistance(self):
+        return self.creator.prof.statistics.distance * 1000 - self.creatorBase
+
+    @property
+    def challengedDistance(self):
+        return self.challenged.prof.statistics.distance * 1000 - self.challengedBase
+
+    def save(self, *args, **kwargs):
+        if not self.creatorBase:
+            self.creatorBase = self.creator.prof.statistics.distance * 1000
+        if not self.challengedBase:
+            self.challengedBase = self.challenged.prof.statistics.distance * 1000
+        super(Challenge, self).save( *args, **kwargs)
+
+    def __str__(self):
+        return self.creator.username + " <> " + self.challenged.username
