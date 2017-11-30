@@ -46,6 +46,7 @@ class Tracking(models.Model):
     meeting = models.ForeignKey(Meeting, related_name="tracks", null=False, on_delete=models.CASCADE)
     user = models.ForeignKey(User, related_name="tracks", null=False, on_delete=models.CASCADE)
 
+
     def __str__(self):
         if self.meeting.title:
             return self.meeting.title
@@ -76,6 +77,21 @@ def update_stats(sender, instance, **kwargs):
      stats.calories += instance.calories
      stats.meetingsCompletats += 1
      stats.lastTracking = instance
+     
+     if stats.maxDistance < instance.distance:
+         stats.maxDistance = instance.distance
+     if stats.maxAverageSpeed < instance.averagespeed:
+         stats.maxAverageSpeed = instance.averagespeed
+     if stats.maxDuration < instance.totalTimeMillis:
+         stats.maxDuration = instance.totalTimeMillis
+         
+     if stats.minDistance > instance.distance or stats.minDistance == 0:
+         stats.minDistance = instance.distance
+     if stats.minAverageSpeed > instance.averagespeed or stats.averagespeed == 0:
+         stats.minAverageSpeed = instance.averagespeed
+     if stats.minDuration > instance.totalTimeMillis or stats.totalTimeMillis == 0 :
+         stats.minDuration = instance.totalTimeMillis
+         
      stats.save()
 
 class Statistics(models.Model):
@@ -85,6 +101,12 @@ class Statistics(models.Model):
     calories = models.FloatField(default=0)
     meetingsCompletats = models.IntegerField(default=0)
     lastTracking = models.OneToOneField(Tracking, null=True)
+    maxDistance = models.IntegerField(default=0)
+    maxAverageSpeed = models.FloatField(default=0)
+    maxDuration = models.IntegerField(default=0)
+    minDistance = models.IntegerField(default=0)
+    minAverageSpeed = models.FloatField(default=0)
+    minDuration = models.IntegerField(default=0)
 
     @property
     def averagespeed(self):

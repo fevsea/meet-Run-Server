@@ -113,7 +113,8 @@ class StatsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Statistics
         fields = (
-        'distance', 'steps', 'totalTimeMillis', 'calories', 'meetingsCompletats', 'averagespeed', 'lastTracking')
+        'distance', 'steps', 'totalTimeMillis', 'calories', 'meetingsCompletats', 'averagespeed', 'lastTracking',
+        'maxDistance', 'maxAverageSpeed', 'maxDuration', 'minDistance', 'minAverageSpeed', 'minDuration')
 
 
 
