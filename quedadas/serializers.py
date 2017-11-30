@@ -115,7 +115,15 @@ class StatsSerializer(serializers.ModelSerializer):
         fields = (
         'distance', 'steps', 'totalTimeMillis', 'calories', 'meetingsCompletats', 'averagespeed', 'lastTracking')
 
+
+
 class ChallengeSerializer(serializers.ModelSerializer):
+    def to_representation(self, instance):
+        data = super(ChallengeSerializer, self).to_representation(instance)
+        data['creator'] = UserSerializerDetail(instance.creator).data
+        data['challenged'] = UserSerializerDetail(instance.challenged).data
+        return data
+
     class Meta:
         model = Challenge
         fields = ('id', 'creator', 'challenged', 'distance', 'created', 'deadline', 'creatorDistance', 'challengedDistance')

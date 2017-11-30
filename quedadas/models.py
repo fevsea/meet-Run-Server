@@ -68,9 +68,9 @@ class Chat(models.Model):
 
 
 @receiver(post_save, sender=Tracking, dispatch_uid="update_statistics")
-def update_stock(sender, instance, **kwargs):
+def update_stats(sender, instance, **kwargs):
      stats = instance.user.prof.statistics
-     stats.distance += instance.distance/1000
+     stats.distance += instance.distance
      stats.steps += instance.steps
      stats.totalTimeMillis += instance.totalTimeMillis
      stats.calories += instance.calories
@@ -79,7 +79,7 @@ def update_stock(sender, instance, **kwargs):
      stats.save()
 
 class Statistics(models.Model):
-    distance = models.FloatField(default=0) # km from m
+    distance = models.FloatField(default=0)
     steps = models.IntegerField(default=0)
     totalTimeMillis = models.IntegerField(default=0)
     calories = models.FloatField(default=0)
@@ -130,17 +130,17 @@ class Challenge(models.Model):
 
     @property
     def creatorDistance(self):
-        return self.creator.prof.statistics.distance * 1000 - self.creatorBase
+        return self.creator.prof.statistics.distance - self.creatorBase
 
     @property
     def challengedDistance(self):
-        return self.challenged.prof.statistics.distance * 1000 - self.challengedBase
+        return self.challenged.prof.statistics.distance - self.challengedBase
 
     def save(self, *args, **kwargs):
         if not self.creatorBase:
-            self.creatorBase = self.creator.prof.statistics.distance * 1000
+            self.creatorBase = self.creator.prof.statistics.distance
         if not self.challengedBase:
-            self.challengedBase = self.challenged.prof.statistics.distance * 1000
+            self.challengedBase = self.challenged.prof.statistics.distance
         super(Challenge, self).save( *args, **kwargs)
 
     def __str__(self):
