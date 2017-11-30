@@ -14,7 +14,7 @@ class ChatList(generics.ListCreateAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        return Chat.objects.filter(Q(userName=user) | Q(friendUsername=user)).order_by("last_message")
+        return user.chats.all()
 
 
     def get_serializer_class(self):

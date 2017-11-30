@@ -59,16 +59,13 @@ class RoutePoint(models.Model):
 
 class Chat(models.Model):
     chatName = models.TextField(null=False, unique=True)
-    userName = models.ForeignKey(User, null=False, related_name='chatA')
-    friendUsername = models.ForeignKey(User, null=False, related_name='chatB')
-    last_message = models.TextField(null=False)
-    last_time = models.DateTimeField(null=True)
-    username_message = models.BooleanField(null=False, default=True)
-    last_hour = models.CharField(max_length=30, null=False)
+    listUsersChat = models.ManyToManyField(User, related_name="chats")
+    type = models.IntegerField()
+    meeting = models.ForeignKey(Meeting, null=True, blank=True)
+    lastMessage = models.TextField(null=False)
+    lastMessageUserName = models.IntegerField(null=True, blank=True)
+    lastDateTime = models.DateTimeField(null=True, blank=True)
 
-
-    class Meta:
-        unique_together = ('userName', 'friendUsername')
 
 @receiver(post_save, sender=Tracking, dispatch_uid="update_statistics")
 def update_stock(sender, instance, **kwargs):

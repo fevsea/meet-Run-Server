@@ -85,17 +85,22 @@ class TrackingSerializer(serializers.ModelSerializer):
         return tracking
 
 class ChatSerializer(serializers.ModelSerializer):
-    userName = UserSerializerDetail(many=False, read_only=True)
-    friendUsername = UserSerializerDetail(many=False, read_only=True)
+    listUsersChat = UserSerializerDetail(many=True, read_only=True)
+    meeting = MeetingSerializer(many=False, read_only=True)
 
     class Meta:
         model = Chat
-        fields = ('pk', 'chatName', 'userName', 'friendUsername', 'last_message', 'last_time', 'username_message', 'last_hour' )
+        fields = ('pk', 'chatName', 'listUsersChat', 'type', 'meeting', 'lastMessage', 'lastMessageUserName', 'lastDateTime' )
 
 class ChatSerializerCreate(serializers.ModelSerializer):
-     class Meta:
+    def to_representation(self, value):
+        return  ChatSerializer().to_representation(value)
+
+
+    class Meta:
         model = Chat
-        fields = ('chatName', 'userName', 'friendUsername', 'last_message', 'last_time', 'username_message', 'last_hour' )
+        fields = (
+        'chatName', 'listUsersChat', 'type', 'meeting', 'lastMessage', 'lastMessageUserName', 'lastDateTime')
 
 class TrackingSerializerNoPoints(serializers.ModelSerializer):
     class Meta:
