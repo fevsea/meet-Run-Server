@@ -165,7 +165,7 @@ class Stats(APIView):
         return Response(serializer.data)
 
 
-class Token(APIView):
+class TokenV(APIView):
     permission_classes = ((IsAuthenticated,))
     def get(self, request):
         user = request.user
