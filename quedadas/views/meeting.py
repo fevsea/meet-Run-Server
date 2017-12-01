@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from functools import reduce
 
 from django.contrib.auth.models import User
@@ -11,6 +11,7 @@ from rest_framework.views import APIView
 from django.db.models import Q
 import operator
 from rest_framework.settings import api_settings
+from django.utils import timezone
 
 from quedadas.models import Meeting, Tracking
 from quedadas.permissions import IsOwnerOrReadOnly
@@ -85,9 +86,9 @@ class UserMeeting(generics.ListAPIView):
         if filter is None or filter == "all":
             pass
         elif filt == "past":
-            qs = qs.filter(date__lt=date.today())
+            qs = qs.filter(date__lt=timezone.now())
         elif filt == "future":
-            qs = qs.filter(date__gte=date.today())
+            qs = qs.filter(date__gte=timezone.now())
         return qs.order_by("date")
 
     serializer_class = MeetingSerializer

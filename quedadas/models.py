@@ -31,6 +31,7 @@ class Friendship(models.Model):
     created = models.DateTimeField(auto_now_add=True, editable=False)
     creator = models.ForeignKey(User, related_name="friendship_creator_set", null=False, on_delete=models.CASCADE)
     friend = models.ForeignKey(User, related_name="friend_set", null=False, on_delete=models.CASCADE)
+    accepted = models.BooleanField(default=False)
 
     def __str__(self):
         return self.creator.username + " - " + self.friend.username
@@ -67,6 +68,9 @@ class Chat(models.Model):
     lastMessageUserName = models.IntegerField(null=True, blank=True)
     lastDateTime = models.DateTimeField(null=True, blank=True)
 
+    @property
+    def num_participiants(self):
+        return self.listUsersChat.count()
 
 @receiver(post_save, sender=Tracking, dispatch_uid="update_statistics")
 def update_stats(sender, instance, **kwargs):
@@ -101,10 +105,10 @@ class Statistics(models.Model):
     calories = models.FloatField(default=0)
     meetingsCompletats = models.IntegerField(default=0)
     lastTracking = models.OneToOneField(Tracking, null=True)
-    maxDistance = models.IntegerField(default=0)
+    maxDistance = models.FloatField(default=0)
     maxAverageSpeed = models.FloatField(default=0)
     maxDuration = models.IntegerField(default=0)
-    minDistance = models.IntegerField(default=0)
+    minDistance = models.FloatField(default=0)
     minAverageSpeed = models.FloatField(default=0)
     minDuration = models.IntegerField(default=0)
 

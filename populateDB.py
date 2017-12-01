@@ -26,7 +26,7 @@ Profile(user=userF, question="My question", answer="My answer", postal_code="080
 userG = User.objects.create_user(username='ericR', password='ericR', first_name="Eric", last_name="Rodríguez")
 Profile(user=userG, question="My question", answer="My answer", postal_code="08034", level=1).save()
 
-
+from django.utils import timezone
 Friendship(creator=userA, friend=userB).save()
 Friendship(creator=userA, friend=userC).save()
 Friendship(creator=userC, friend=userA).save()
