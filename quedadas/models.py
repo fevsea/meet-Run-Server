@@ -31,6 +31,7 @@ class Friendship(models.Model):
     created = models.DateTimeField(auto_now_add=True, editable=False)
     creator = models.ForeignKey(User, related_name="friendship_creator_set", null=False, on_delete=models.CASCADE)
     friend = models.ForeignKey(User, related_name="friend_set", null=False, on_delete=models.CASCADE)
+    accepted = models.BooleanField(default=False)
 
     def __str__(self):
         return self.creator.username + " - " + self.friend.username
