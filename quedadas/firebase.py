@@ -1,6 +1,6 @@
 from pyfcm import FCMNotification
 
-push_service = FCMNotification(api_key="AIzaSyAl0qjjXVTPMyQ5ndAH5Gz0phLh7xCIUBY")
+push_service = FCMNotification(api_key="AAAA19KbT04:APA91bFroH6rGfC-eywj49abV2OZMyVj-St1v7eOhwSADPKG0Fon8tfwVxMRYlcIYOkHf8xEqnqlpbIuqU7W3oF9LhxiDjLlKw4BoXaIknY75t1rBDZTP5OzY6iYz_MJF2FGAadmoqT_")
 data_message = {
     "Nick" : "Mario",
     "body" : "great match!",
