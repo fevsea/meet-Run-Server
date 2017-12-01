@@ -101,7 +101,7 @@ class JoinMeeting(APIView):
     permission_classes = ((IsAuthenticated,))
     pagination_class = api_settings.DEFAULT_PAGINATION_CLASS
 
-    def get(self, request, pk):
+    def get(self, request, pk, usr=None):
         meeting = get_object_or_404(Meeting, pk=pk)
         attendences = meeting.participants.all()
         page = self.paginate_queryset(attendences)
@@ -112,16 +112,20 @@ class JoinMeeting(APIView):
         serializer = UserSerializerDetail(attendences, many=True)
         return Response(serializer.data)
 
-    def post(self, request, pk):
+    def post(self, request, pk, usr=None):
         user = request.user
+        if usr is not None:
+            user = get_object_or_404(User, pk=usr)
         meeting = get_object_or_404(Meeting, pk=pk)
         status_code = HTTP_204_NO_CONTENT if user in meeting.participants.all() else HTTP_201_CREATED
         meeting.participants.add(user)
         meeting.save()
         return Response(status=status_code)
 
-    def delete(self, request, pk):
+    def delete(self, request, pk, usr):
         user = request.user
+        if usr is not None:
+            user = get_object_or_404(User, usr)
         meeting = get_object_or_404(Meeting, pk=pk)
         status_code = HTTP_200_OK if user in meeting.participants.all() else HTTP_204_NO_CONTENT
         meeting.participants.remove(user)

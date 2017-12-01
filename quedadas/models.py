@@ -112,7 +112,7 @@ class Statistics(models.Model):
     def averagespeed(self):
         if self.totalTimeMillis == 0:
             return 0
-        return float(self.distance/(self.totalTimeMillis/3600000))
+        return float(self.distance/(self.totalTimeMillis/1000))
 
     def __str__(self):
         if self.prof.user.username:

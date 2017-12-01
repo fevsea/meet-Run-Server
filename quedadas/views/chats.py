@@ -12,9 +12,10 @@ from quedadas.serializers import ChatSerializer, ChatSerializerCreate
 class ChatList(generics.ListCreateAPIView):
     permission_classes = (permissions.IsAuthenticated,)
 
+
     def get_queryset(self):
         user = self.request.user
-        return user.chats.all()
+        return user.chats.all().order_by('lastDateTime')
 
 
     def get_serializer_class(self):
