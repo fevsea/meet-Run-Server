@@ -1,0 +1,11 @@
+from pyfcm import FCMNotification
+
+push_service = FCMNotification(api_key="AIzaSyAl0qjjXVTPMyQ5ndAH5Gz0phLh7xCIUBY")
+data_message = {
+    "Nick" : "Mario",
+    "body" : "great match!",
+    "Room" : "PortugalVSDenmark"
+}
+message_body = "Hope you're having fun this weekend, don't forget to check today's news"
+registration_id = "eGKFhSf5OiY:APA91bE7eY3Dv1oLGvStcnZhzRQRjO0aS7-DWq4IHpmi030ZOXHKgRsUISd83ZJjJID3YQiCfUzj0MUmI2unH7veUKpoo3CjRAzmeFb5E3l3GcZd8L29DbiMSkLD5mQs9Khx4_S4U2uq"
+result = push_service.notify_single_device(registration_id=registration_id, message_body=message_body, data_message=data_message)
