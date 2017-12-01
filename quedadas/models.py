@@ -126,6 +126,7 @@ class Profile(models.Model):
     postal_code = models.CharField(max_length=5, blank=False, null=False)
     level = models.IntegerField(null=False, blank=False, default=0)
     statistics = models.OneToOneField(Statistics, on_delete=models.CASCADE, related_name='prof', null=True, blank=True)
+    token = models.CharField(null=True, blank=True, max_length=256)
 
     def get_friends(self):
         user = self.user

@@ -1,10 +1,12 @@
 from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.db.models import Q
+from django.http import JsonResponse
 from rest_framework import generics, permissions
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.generics import get_object_or_404
+from rest_framework.parsers import JSONParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN, HTTP_200_OK, HTTP_400_BAD_REQUEST, \
@@ -14,7 +16,7 @@ from rest_framework.settings import api_settings
 
 from quedadas.models import Friendship
 from quedadas.permissions import IsOwnerOrReadOnly
-from quedadas.serializers import UserSerializer, UserSerializerDetail, ChangePassword, StatsSerializer
+from quedadas.serializers import UserSerializer, UserSerializerDetail, ChangePassword, StatsSerializer, TokenSerializer
 
 
 class UserList(generics.ListCreateAPIView):
@@ -161,3 +163,24 @@ class Stats(APIView):
             user = get_object_or_404(User, pk=pk)
         serializer = StatsSerializer(user.prof.statistics, many=False)
         return Response(serializer.data)
+
+
+class Token(APIView):
+    permission_classes = ((IsAuthenticated,))
+    def get(self, request):
+        user = request.user
+        serializer = TokenSerializer({"token": user.prof.token}, many=False)
+        return Response(serializer.data)
+
+    def post(self, request):
+        user = request.user
+        data = JSONParser().parse(request)
+        serializer = TokenSerializer(data=data)
+        if serializer.is_valid():
+            token = serializer.data["token"]
+            user.prof.token = token
+            user.prof.save()
+            serializer = TokenSerializer({"token": user.prof.token}, many=False)
+            return JsonResponse(serializer.data)
+        return JsonResponse(serializer.errors, status=400)
+

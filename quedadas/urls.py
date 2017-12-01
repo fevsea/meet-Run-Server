@@ -22,6 +22,7 @@ urlpatterns = [
     url(r'^users/current$', user.CurrentUserView.as_view(), name='current-user'),
     url(r'^users/login$', user.login),
     url(r'^users/logout$', user.logout),
+    url(r'^users/token', user.Token.as_view(), name='token'),
     url(r'^users/changePassword$', user.changePassword.as_view(), name='change-password'),
     url(r'^users/friends$', user.Friends.as_view(), name='firends'),
     url(r'^users/friends/(?P<pk>[0-9]+)$', user.Friends.as_view(), name='add-firends'),

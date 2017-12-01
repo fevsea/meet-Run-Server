@@ -62,6 +62,8 @@ class ChangePassword(serializers.Serializer):
     old = serializers.CharField(required=True)
     new = serializers.CharField(required=True)
 
+class TokenSerializer(serializers.Serializer):
+    token = serializers.CharField(required=True)
 
 class PointSerializer(serializers.ModelSerializer):
     class Meta:
