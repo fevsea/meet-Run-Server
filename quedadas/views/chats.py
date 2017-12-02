@@ -49,6 +49,9 @@ class ChatP2p(APIView):
     def get(self, request, pk):
         userA = request.user
         userB = get_object_or_404(User, pk=pk)
-        chat = Chat.objects.filter(listUsersChat=(userA, userB))
-        pass
-
+        chats = Chat.objects.filter(listUsersChat=userA).filter(listUsersChat=userB).distinct()
+        for chat in chats:
+            if chat.listUsersChat.count() == 2:
+                serializer = ChatSerializer(chat)
+                return Response(serializer.data)
+        return Response(status=404)
