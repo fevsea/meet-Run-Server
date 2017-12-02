@@ -136,4 +136,4 @@ class FriendSerializer(serializers.ModelSerializer):
     friend  = UserSerializerDetail(many=False, read_only=True)
     class Meta:
         model = Friendship
-        fields = ('pk', 'created', 'creator', 'friend', 'accepted')
+        fields = ('created', 'creator', 'friend', 'accepted')
