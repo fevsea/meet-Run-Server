@@ -16,7 +16,8 @@ from rest_framework.settings import api_settings
 
 from quedadas.models import Friendship
 from quedadas.permissions import IsOwnerOrReadOnly
-from quedadas.serializers import UserSerializer, UserSerializerDetail, ChangePassword, StatsSerializer, TokenSerializer
+from quedadas.serializers import UserSerializer, UserSerializerDetail, ChangePassword, StatsSerializer, TokenSerializer, \
+    FriendSerializer
 
 
 class UserList(generics.ListCreateAPIView):
@@ -94,10 +95,10 @@ class Friends(APIView):
         user = request.user
         if pk is not None:
             user = get_object_or_404(User, pk=pk)
-        friends_qs = user.prof.get_friends()
+        friends_qs = Friendship.objects.filter(Q(creator=user)| Q(friend=user))
         page = self.paginate_queryset(friends_qs)
         if page is not None:
-            serializer = UserSerializerDetail(page, many=True)
+            serializer = FriendSerializer(page, many=True)
             return self.get_paginated_response(serializer.data)
 
         serializer = UserSerializerDetail(friends_qs, many=True)
@@ -107,13 +108,25 @@ class Friends(APIView):
         user = request.user
         friend = get_object_or_404(User, pk=pk)
         status_code = HTTP_202_ACCEPTED
+
         firends_qs = user.prof.get_friends().filter(pk=pk)
-        if (not firends_qs.exists() and pk != user.pk):
+        friendship = Friendship.objects.filter(Q(creator=user, friend=friend) | Q(friend=user, creator=friend))
+        if pk == user.pk:
+            status_code = HTTP_204_NO_CONTENT
+        elif not friendship.exists():
             Friendship(creator=user, friend=friend).save()
             status_code = HTTP_201_CREATED
+        else:
+            friendshipI = friendship[0]
+            if friendshipI.creator.pk == user.pk:
+                status_code = HTTP_204_NO_CONTENT
+            else:
+                friendshipI.accepted = True
+                friendshipI.save()
+                status_code = HTTP_201_CREATED
 
-        firends_qs = user.prof.get_friends()
-        serializer = UserSerializerDetail(firends_qs, many=True)
+        firends_qs = Friendship.objects.filter(Q(creator=user, friend=friend) | Q(friend=user, creator=friend))
+        serializer = FriendSerializer(firends_qs, many=True)
         return Response(serializer.data, status_code)
 
     def delete(self, request, pk=None, format=None):

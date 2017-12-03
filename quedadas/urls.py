@@ -33,6 +33,7 @@ urlpatterns = [
     # Chats
     url(r'^chats$', chats.ChatList.as_view(), name='chat-list'),
     url(r'^chats/(?P<pk>[0-9]+)$', chats.ChatDetail.as_view(), name='chat-detail'),
+    url(r'^chats/p2p/(?P<pk>[0-9]+)$', chats.ChatP2p.as_view(), name='chat-p2p'),
 
     # Challenge
     url(r'^challenges$', challenge.ChallengeList.as_view(), name='challenge-list'),

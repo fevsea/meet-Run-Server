@@ -1,7 +1,9 @@
 from django.contrib.auth.models import User
 from django.db.models import Q
 from rest_framework import generics, permissions, status
+from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
+from rest_framework.views import APIView
 
 from quedadas.models import Chat
 from quedadas.permissions import IsOwnerOrReadOnly
@@ -42,3 +44,14 @@ class ChatDetail(generics.RetrieveUpdateDestroyAPIView):
         if self.request.method in ('POST', 'PATCH', 'PUT'):
             return ChatSerializerCreate
         return ChatSerializer
+
+class ChatP2p(APIView):
+    def get(self, request, pk):
+        userA = request.user
+        userB = get_object_or_404(User, pk=pk)
+        chats = Chat.objects.filter(listUsersChat=userA).filter(listUsersChat=userB).distinct()
+        for chat in chats:
+            if chat.listUsersChat.count() == 2:
+                serializer = ChatSerializer(chat)
+                return Response(serializer.data)
+        return Response(status=404)

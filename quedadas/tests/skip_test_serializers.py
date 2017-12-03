@@ -12,9 +12,10 @@ from quedadas.models import Profile
 from quedadas.serializers import UserSerializerDetail, UserSerializer
 
 
-class UserTests(APITestCase):
+class SkeepUserTests(APITestCase):
     def setUp(self):
-        populate()
+        pass
+        #populate()
 
     @unittest.skip("demonstrating skipping")
     def test_serialize_one_user(self):
