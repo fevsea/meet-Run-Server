@@ -100,7 +100,7 @@ class Statistics(models.Model):
     totalTimeMillis = models.IntegerField(default=0)
     calories = models.FloatField(default=0)
     meetingsCompletats = models.IntegerField(default=0)
-    lastTracking = models.OneToOneField(Tracking, null=True)
+    lastTracking = models.OneToOneField(Tracking, null=True, on_delete=models.SET_NULL)
     maxDistance = models.IntegerField(default=0)
     maxAverageSpeed = models.FloatField(default=0)
     maxDuration = models.IntegerField(default=0)
