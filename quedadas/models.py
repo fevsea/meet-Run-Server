@@ -62,7 +62,7 @@ class Chat(models.Model):
     chatName = models.TextField(null=False, unique=True)
     listUsersChat = models.ManyToManyField(User, related_name="chats")
     type = models.IntegerField()
-    meeting = models.ForeignKey(Meeting, null=True, blank=True)
+    meeting = models.ForeignKey(Meeting, null=True, blank=True, on_delete=models.CASCADE)
     lastMessage = models.TextField(null=False)
     lastMessageUserName = models.IntegerField(null=True, blank=True)
     lastDateTime = models.DateTimeField(null=True, blank=True)
@@ -143,8 +143,8 @@ def init_statistics(sender, instance, **kwargs):
 
 
 class Challenge(models.Model):
-    creator = models.ForeignKey(User, related_name="challenge_creator", null=False)
-    challenged = models.ForeignKey(User, related_name="challenged", null=False)
+    creator = models.ForeignKey(User, related_name="challenge_creator", null=False, on_delete=models.CASCADE)
+    challenged = models.ForeignKey(User, related_name="challenged", null=False, on_delete=models.CASCADE)
     distance = models.IntegerField(null=False)
     created = models.DateTimeField(auto_now_add=True)
     deadline = models.DateTimeField()
