@@ -96,11 +96,13 @@ class Friends(APIView):
 
     def get(self, request, pk=None):
         user = request.user
-        qs = self.que
         if pk is not None:
             user = get_object_or_404(User, pk=pk)
         friends_qs = Friendship.objects.filter(Q(creator=user)| Q(friend=user))
-        friends_qs = self.filter_queryset(friends_qs)
+        accepted = request.query_params.get("accepted")
+        if accepted is not None:
+            accepted = accepted in ['true', 'True', '1', 't', 'y', 'yes', 'yeah', 'yup', 'certainly', 'uh-huh']
+            friends_qs=  friends_qs.filter(accepted=accepted)
         page = self.paginate_queryset(friends_qs)
         if page is not None:
             serializer = FriendSerializer(page, many=True)
@@ -113,7 +115,6 @@ class Friends(APIView):
         user = request.user
         friend = get_object_or_404(User, pk=pk)
         status_code = HTTP_202_ACCEPTED
-
         firends_qs = user.prof.get_friends().filter(pk=pk)
         friendship = Friendship.objects.filter(Q(creator=user, friend=friend) | Q(friend=user, creator=friend))
         if pk == user.pk:

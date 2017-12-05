@@ -3,7 +3,7 @@ import django
 import os
 #os.environ.setdefault("DJANGO_SETTINGS_MODULE", "rest.settings")
 #django.setup()
-from django.contrib.auth.models import User
+#from django.contrib.auth.models import User
 import asyncio
 
 push_service = FCMNotification(api_key="AAAA19KbT04:APA91bFroH6rGfC-eywj49abV2OZMyVj-St1v7eOhwSADPKG0Fon8tfwVxMRYlcIYOkHf8xEqnqlpbIuqU7W3oF9LhxiDjLlKw4BoXaIknY75t1rBDZTP5OzY6iYz_MJF2FGAadmoqT_")
@@ -25,6 +25,11 @@ data_message = {
     "title" : "Error del sistema",
     "text" : "La app ha provocado overflow de la lista de errores",
 }
+
+
+awais = "ffhIBWlzXnQ:APA91bGzzrfJnmZrE432EC_LF3XP9YLrKxtDG09ptiaa7sPPe2jIXeyFTixXNMQA2g3bZwXVZvRIudzaCYO3yyAhnaWj_zhDTUpFuGSlbcLNzrgtwrlkhukU6HL27YQ4tiRm-lebJ6Rc"
+result = push_service.notify_single_device(registration_id=awais, message_body="notification",
+                                                  data_message=data_message)
 
 #message_body = "notification"
 #registration_id = User.objects.get(username="alejandroA").prof.token
