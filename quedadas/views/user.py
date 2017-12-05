@@ -2,6 +2,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.http import JsonResponse
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, permissions
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
@@ -90,12 +91,16 @@ def logout(request):
 class Friends(APIView):
     permission_classes = ((IsAuthenticated,))
     pagination_class = api_settings.DEFAULT_PAGINATION_CLASS
+    filter_backends = (DjangoFilterBackend,)
+    filter_fields = ('accepted',)
 
     def get(self, request, pk=None):
         user = request.user
+        qs = self.que
         if pk is not None:
             user = get_object_or_404(User, pk=pk)
         friends_qs = Friendship.objects.filter(Q(creator=user)| Q(friend=user))
+        friends_qs = self.filter_queryset(friends_qs)
         page = self.paginate_queryset(friends_qs)
         if page is not None:
             serializer = FriendSerializer(page, many=True)

@@ -3,10 +3,13 @@ from django.contrib.auth.models import User
 from django.db import models
 
 
+
 # Create your models here.
 from django.db.models.query_utils import Q
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+
+from quedadas import firebase
 
 
 class Meeting(models.Model):
@@ -154,6 +157,7 @@ class Challenge(models.Model):
     deadline = models.DateTimeField()
     creatorBase = models.FloatField(null=True)
     challengedBase = models.FloatField(null=True)
+    accepted = models.BooleanField(default=False)
 
     @property
     def creatorDistance(self):
@@ -168,7 +172,13 @@ class Challenge(models.Model):
             self.creatorBase = self.creator.prof.statistics.distance
         if not self.challengedBase:
             self.challengedBase = self.challenged.prof.statistics.distance
+
         super(Challenge, self).save( *args, **kwargs)
+
 
     def __str__(self):
         return self.creator.username + " <> " + self.challenged.username
+
+@receiver(post_save, sender=Challenge, dispatch_uid="notify_new_challenge")
+def notify_user(sender, instance, **kwargs):
+    firebase.new_challenge(instance)
