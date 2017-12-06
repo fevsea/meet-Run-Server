@@ -157,7 +157,7 @@ class Challenge(models.Model):
     deadline = models.DateTimeField()
     creatorBase = models.FloatField(null=True)
     challengedBase = models.FloatField(null=True)
-    accepted = models.BooleanField(default=False)
+    accepted = models.BooleanField(default=False, blank=True)
 
     @property
     def creatorDistance(self):

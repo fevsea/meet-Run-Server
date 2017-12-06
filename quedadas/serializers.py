@@ -129,7 +129,7 @@ class ChallengeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Challenge
-        fields = ('id', 'creator', 'challenged', 'distance', 'created', 'deadline', 'creatorDistance', 'challengedDistance')
+        fields = ('id', 'creator', 'challenged', 'distance', 'created', 'deadline', 'creatorDistance', 'challengedDistance', 'accepted')
 
 class FriendSerializer(serializers.ModelSerializer):
     creator = UserSerializerDetail(many=False, read_only=True)
