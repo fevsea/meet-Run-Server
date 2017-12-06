@@ -1,14 +1,11 @@
-from pyfcm import FCMNotification
 import django
 import os
-#os.environ.setdefault("DJANGO_SETTINGS_MODULE", "rest.settings")
-#django.setup()
-#from django.contrib.auth.models import User
-import asyncio
+from pyfcm import FCMNotification
+
 
 push_service = FCMNotification(api_key="AAAA19KbT04:APA91bFroH6rGfC-eywj49abV2OZMyVj-St1v7eOhwSADPKG0Fon8tfwVxMRYlcIYOkHf8xEqnqlpbIuqU7W3oF9LhxiDjLlKw4BoXaIknY75t1rBDZTP5OzY6iYz_MJF2FGAadmoqT_")
 
-async def notify_user(User, message_body, data_message=None):
+def notify_user(User, message_body, data_message=None):
     registration_id = User.prof.token
     if registration_id is not None:
         result = push_service.notify_single_device(registration_id=registration_id, message_body=message_body,
@@ -17,7 +14,37 @@ async def notify_user(User, message_body, data_message=None):
 def new_challenge(challenge):
     user = challenge.challenged
     type = "new_challenge"
-    data = {"challenge_id": challenge.pk}
+    data = {
+        "challenge_id": challenge.pk,
+        "challenger_username": challenge.creator.username
+    }
+    notify_user(user, type, data)
+
+def challenge_accepted(challenge):
+    user = challenge.challenged
+    type = "challenge_accepted"
+    data = {
+        "challenge_id": challenge.pk,
+        "challenged_username": challenge.challenged.username
+    }
+    notify_user(user, type, data)
+
+def new_friend(friendship):
+    user = friendship.friend
+    type = "friend_request"
+    data = {
+        "friend_id": friendship.creator.id,
+        "friend_name": friendship.creator.username
+    }
+    notify_user(user, type, data)
+
+def friend_accepted(friendship):
+    user = friendship.creator
+    type = "friend_accepted"
+    data = {
+        "friend_id": friendship.friend.id,
+        "friend_name": friendship.friend.username
+    }
     notify_user(user, type, data)
 
 
