@@ -15,7 +15,7 @@ class ChallengeList(generics.ListCreateAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        qs = Challenge.objects.filter(Q(creator=user) | Q(challenged=user)).distinct()
+        qs = Challenge.objects.filter(completed=False).filter(Q(creator=user) | Q(challenged=user)).distinct()
         return qs
 
 

@@ -33,6 +33,34 @@ def challenge_accepted(challenge):
     }
     notify_user(user, data)
 
+def challenge_won(challenge, user):
+    user = challenge.challenged
+    data = {
+        "type": "challenge_won",
+        "challenge_id": challenge.pk,
+        "winner_id": user.pk
+    }
+    notify_user(user,  data)
+
+def challenge_lost(challenge, user):
+    data = {
+        "type": "challenge_lost",
+        "challenge_id": challenge.pk,
+        "winner_id": user.pk
+    }
+    notify_user(user, data)
+
+def challenge_finalized(challenge):
+    userA = challenge.challenged
+    userB = challenge.creator
+    data = {
+        "type": "challenge_finalized",
+        "challenge_id": challenge.pk,
+    }
+    notify_user(userA, data)
+    notify_user(userB, data)
+
+
 def new_friend(friendship):
     user = friendship.friend
     data = {

@@ -8,6 +8,7 @@ from django.db import models
 from django.db.models.query_utils import Q
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils import timezone
 
 from quedadas import firebase
 
@@ -177,13 +178,18 @@ class Challenge(models.Model):
         super(Challenge, self).save( *args, **kwargs)
 
     def check_completion(self):
-
-        if self.challengedDistance >= self.distance:
-            #challenged wines
-            pass
+        if self.deadline < timezone.now():
+            firebase.challenge_finalized(self)
+            self.completed = True
+        elif self.challengedDistance >= self.distance:
+            firebase.challenge_won(self, self.challenged)
+            firebase.challenge_lost(self, self.creator)
+            self.completed = True
         elif self.creatorDistance >= self.distance:
-            #creator wins
-            pass
+            firebase.challenge_lost(self, self.challenged)
+            firebase.challenge_won(self, self.creator)
+            self.completed = True
+        self.save()
 
     def __str__(self):
         return self.creator.username + " <> " + self.challenged.username

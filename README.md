@@ -32,6 +32,12 @@ Mata qualsevol procés de python en background
 
 `python manage.py createsuperuser`
 
+Cron per comprovar challenges finalitzats
+Afegir a "sudo crontab -e":
+
+
+`*/5 * * * * /path/to/python_interpreter /path/to/project/manage.py checkchallenges
+`*/5 * * * * /home/alumne/.virtualenvs/development/bin/python3 /home/alumne/development/manage.py checkchallenges'
 # Doker (noy yet working)
 
 ## Ubuntu install
