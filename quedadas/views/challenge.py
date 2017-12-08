@@ -1,5 +1,7 @@
 from django.db.models import Q
 from rest_framework import generics, permissions
+from rest_framework.generics import get_object_or_404
+from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from quedadas.models import Challenge
@@ -17,7 +19,16 @@ class ChallengeList(generics.ListCreateAPIView):
         return qs
 
 
-class ChallengeDetail(generics.RetrieveUpdateDestroyAPIView):
+class ChallengeDetail(generics.RetrieveUpdateDestroyAPIView, APIView):
     queryset = Challenge.objects.all()
     serializer_class = ChallengeSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
+    def post(self, request, pk):
+        challenge = get_object_or_404(Challenge, pk=pk)
+        if challenge.challenged == request.user:
+            challenge.accepted = True
+            challenge.save()
+            challenge.notify_accepted()
+            return Response(200)
+        return Response(403)

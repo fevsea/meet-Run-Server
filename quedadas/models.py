@@ -67,7 +67,7 @@ class Chat(models.Model):
     listUsersChat = models.ManyToManyField(User, related_name="chats")
     type = models.IntegerField()
     meeting = models.ForeignKey(Meeting, null=True, blank=True, on_delete=models.CASCADE)
-    lastMessage = models.TextField(null=False)
+    lastMessage = models.TextField(null=False, blank=True)
     lastMessageUserName = models.IntegerField(null=True, blank=True)
     lastDateTime = models.DateTimeField(null=True, blank=True)
 
@@ -98,7 +98,6 @@ def update_stats(sender, instance, **kwargs):
          stats.minAverageSpeed = instance.averagespeed
      if stats.minDuration > instance.totalTimeMillis or stats.totalTimeMillis == 0 :
          stats.minDuration = instance.totalTimeMillis
-         
      stats.save()
 
 class Statistics(models.Model):
@@ -158,6 +157,8 @@ class Challenge(models.Model):
     creatorBase = models.FloatField(null=True)
     challengedBase = models.FloatField(null=True)
     accepted = models.BooleanField(default=False, blank=True)
+    completed = models.BooleanField(default=False, blank=True)
+
 
     @property
     def creatorDistance(self):
@@ -175,9 +176,29 @@ class Challenge(models.Model):
 
         super(Challenge, self).save( *args, **kwargs)
 
+    def check_completion(self):
+
+        if self.challengedDistance >= self.distance:
+            #challenged wines
+            pass
+        elif self.creatorDistance >= self.distance:
+            #creator wins
+            pass
 
     def __str__(self):
         return self.creator.username + " <> " + self.challenged.username
+
+    def notify_accepted(self):
+        firebase.challenge_accepted(self)
+
+
+@receiver(post_save, sender=Tracking, dispatch_uid="update_challenge_statistics")
+def update_challenge_statistics(sender, instance, **kwargs):
+    user = instance.user
+    challenges_creator = user.challenge_creator.filter(completed=False)
+    challenges_challenged = user.challenged.filter(completed=False)
+    for challenge in (challenges_creator | challenges_challenged).distinct():
+        challenge.check_completion()
 
 @receiver(post_save, sender=Challenge, dispatch_uid="notify_new_challenge")
 def notify_user(sender, instance, **kwargs):
