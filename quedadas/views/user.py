@@ -207,3 +207,9 @@ class TokenV(APIView):
             return JsonResponse(serializer.data)
         return JsonResponse(serializer.errors, status=400)
 
+    def delete(self, request):
+        user = request.user
+        user.prof.token = None
+        user.prof.save()
+        return Response(status=200)
+
