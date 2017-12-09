@@ -67,7 +67,7 @@ class Chat(models.Model):
     chatName = models.TextField(null=False, unique=True)
     listUsersChat = models.ManyToManyField(User, related_name="chats")
     type = models.IntegerField()
-    meeting = models.ForeignKey(Meeting, null=True, blank=True, on_delete=models.CASCADE)
+    meeting = models.OneToOneField(Meeting, null=True, blank=True, on_delete=models.CASCADE, related_name="chat")
     lastMessage = models.TextField(null=False, blank=True)
     lastMessageUserName = models.IntegerField(null=True, blank=True)
     lastDateTime = models.DateTimeField(null=True, blank=True)

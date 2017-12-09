@@ -55,7 +55,7 @@ class MeetingSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Meeting
-        fields = ('id', 'title', 'description', 'public', 'level', 'date', 'latitude', 'longitude', 'owner')
+        fields = ('id', 'title', 'description', 'public', 'level', 'date', 'latitude', 'longitude', 'owner', 'chat')
 
 
 class ChangePassword(serializers.Serializer):
