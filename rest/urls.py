@@ -21,9 +21,14 @@ from rest_framework.schemas import get_schema_view
 schema_view = get_schema_view(title='MeetNRun API')
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
+
+from rest_framework_swagger.views import get_swagger_view
+
+schema_view_ui = get_swagger_view(title='Pastebin API')
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^schema/$', schema_view),
+    url(r'^docs/$', schema_view_ui, name="docs"),
     url(r'^', include('quedadas.urls')),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]
