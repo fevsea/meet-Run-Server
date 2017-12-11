@@ -17,7 +17,7 @@ class ChatList(generics.ListCreateAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        return user.chats.all().order_by('lastDateTime')
+        return user.chats.all().order_by('-lastDateTime')
 
 
     def get_serializer_class(self):
@@ -36,7 +36,7 @@ class ChatList(generics.ListCreateAPIView):
 
 
 class ChatDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Chat.objects.all()
+    queryset = Chat.objects.order_by('lastDateTime')
     serializer_class = ChatSerializer
     permission_classes = (permissions.IsAuthenticated, IsOwnerOrReadOnly)
 
