@@ -48,6 +48,7 @@ class UserSerializerDetail(serializers.ModelSerializer):
 
 class MeetingSerializer(serializers.ModelSerializer):
     owner = UserSerializerDetail(many=False, read_only=True)
+    chat = serializers.IntegerField(source="chat_r.pk", read_only=True)
     #participants = UserSerializerDetail(many=True, read_only=True)
 
     def perform_create(self, serializer):
