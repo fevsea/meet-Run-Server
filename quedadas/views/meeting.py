@@ -1,17 +1,16 @@
-from datetime import date, datetime
+import operator
 from functools import reduce
 
 from django.contrib.auth.models import User
+from django.db.models import Q
+from django.utils import timezone
 from rest_framework import generics, permissions, filters, mixins, status
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.settings import api_settings
 from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_204_NO_CONTENT, HTTP_200_OK
 from rest_framework.views import APIView
-from django.db.models import Q
-import operator
-from rest_framework.settings import api_settings
-from django.utils import timezone
 
 from quedadas.models import Meeting, Tracking
 from quedadas.permissions import IsOwnerOrReadOnly
@@ -66,7 +65,7 @@ class TrackingView(mixins.CreateModelMixin,
         if serializer.is_valid():
             serializer.validated_data.update({
                 'user': get_object_or_404(User, pk=user),
-                'meeting' : get_object_or_404(Meeting, pk=meeting)
+                'meeting': get_object_or_404(Meeting, pk=meeting)
             })
             serializer.save()
             return Response(serializer.data, status=HTTP_201_CREATED)
@@ -99,7 +98,7 @@ class UserMeeting(generics.ListAPIView):
 
 
 class JoinMeeting(APIView):
-    permission_classes = ((IsAuthenticated,))
+    permission_classes = (IsAuthenticated,)
     pagination_class = api_settings.DEFAULT_PAGINATION_CLASS
 
     def get(self, request, pk, usr=None):
@@ -159,4 +158,3 @@ class JoinMeeting(APIView):
         """
         assert self.paginator is not None
         return self.paginator.get_paginated_response(data)
-

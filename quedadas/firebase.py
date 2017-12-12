@@ -1,10 +1,3 @@
-import django
-import os
-
-
-
-
-
 def notify_user(User, data_message=None):
     from pyfcm import FCMNotification
     push_service = FCMNotification(
@@ -13,16 +6,18 @@ def notify_user(User, data_message=None):
     registration_id = User.prof.token
     if registration_id is not None:
         result = push_service.single_device_data_message(registration_id=registration_id,
-                                                  data_message=data_message)
+                                                         data_message=data_message)
+
 
 def new_challenge(challenge):
     user = challenge.challenged
     data = {
-        "type" : "new_challenge",
+        "type": "new_challenge",
         "challenge_id": challenge.pk,
         "challenger_username": challenge.creator.username
     }
     notify_user(user, data)
+
 
 def challenge_accepted(challenge):
     user = challenge.challenged
@@ -33,6 +28,7 @@ def challenge_accepted(challenge):
     }
     notify_user(user, data)
 
+
 def challenge_won(challenge, user):
     user = challenge.challenged
     data = {
@@ -40,7 +36,8 @@ def challenge_won(challenge, user):
         "challenge_id": challenge.pk,
         "winner_id": user.pk
     }
-    notify_user(user,  data)
+    notify_user(user, data)
+
 
 def challenge_lost(challenge, user):
     data = {
@@ -49,6 +46,7 @@ def challenge_lost(challenge, user):
         "winner_id": user.pk
     }
     notify_user(user, data)
+
 
 def challenge_finalized(challenge):
     userA = challenge.challenged
@@ -70,6 +68,7 @@ def new_friend(friendship):
     }
     notify_user(user, data)
 
+
 def friend_accepted(friendship):
     user = friendship.creator
     data = {
@@ -78,4 +77,3 @@ def friend_accepted(friendship):
         "friend_name": friendship.friend.username
     }
     notify_user(user, data)
-

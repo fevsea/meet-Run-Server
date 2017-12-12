@@ -1,5 +1,4 @@
 from django.contrib.auth.models import User
-from django.db.models import Q
 from rest_framework import generics, permissions, status
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
@@ -10,15 +9,12 @@ from quedadas.permissions import IsOwnerOrReadOnly
 from quedadas.serializers import ChatSerializer, ChatSerializerCreate
 
 
-
 class ChatList(generics.ListCreateAPIView):
     permission_classes = (permissions.IsAuthenticated,)
-
 
     def get_queryset(self):
         user = self.request.user
         return user.chats.all().order_by('-lastDateTime')
-
 
     def get_serializer_class(self):
         if self.request.method in ('POST', 'PATCH', 'PUT'):
@@ -44,6 +40,7 @@ class ChatDetail(generics.RetrieveUpdateDestroyAPIView):
         if self.request.method in ('POST', 'PATCH', 'PUT'):
             return ChatSerializerCreate
         return ChatSerializer
+
 
 class ChatP2p(APIView):
     def get(self, request, pk):

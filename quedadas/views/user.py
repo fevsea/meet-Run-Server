@@ -10,16 +10,16 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.parsers import JSONParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.settings import api_settings
 from rest_framework.status import HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN, HTTP_200_OK, HTTP_400_BAD_REQUEST, \
     HTTP_202_ACCEPTED, HTTP_201_CREATED, HTTP_204_NO_CONTENT
 from rest_framework.views import APIView
-from rest_framework.settings import api_settings
 
 from quedadas import firebase
 from quedadas.models import Friendship
 from quedadas.permissions import IsOwnerOrReadOnly
-from quedadas.serializers import UserSerializer, UserSerializerDetail, ChangePassword, StatsSerializer, TokenSerializer, \
-    FriendSerializer
+from quedadas.serializers import UserSerializer, UserSerializerDetail, ChangePassword, StatsSerializer, \
+    TokenSerializer, FriendSerializer
 
 
 class UserList(generics.ListCreateAPIView):
@@ -90,7 +90,7 @@ def logout(request):
 
 
 class Friends(APIView):
-    permission_classes = ((IsAuthenticated,))
+    permission_classes = (IsAuthenticated,)
     pagination_class = api_settings.DEFAULT_PAGINATION_CLASS
     filter_backends = (DjangoFilterBackend,)
     filter_fields = ('accepted',)
@@ -99,11 +99,11 @@ class Friends(APIView):
         user = request.user
         if pk is not None:
             user = get_object_or_404(User, pk=pk)
-        friends_qs = Friendship.objects.filter(Q(creator=user)| Q(friend=user))
+        friends_qs = Friendship.objects.filter(Q(creator=user) | Q(friend=user))
         accepted = request.query_params.get("accepted")
         if accepted is not None:
             accepted = accepted in ['true', 'True', '1', 't', 'y', 'yes', 'yeah', 'yup', 'certainly', 'uh-huh']
-            friends_qs=  friends_qs.filter(accepted=accepted)
+            friends_qs = friends_qs.filter(accepted=accepted)
         page = self.paginate_queryset(friends_qs)
         if page is not None:
             serializer = FriendSerializer(page, many=True)
@@ -144,7 +144,7 @@ class Friends(APIView):
         friend = get_object_or_404(User, pk=pk)
         status_code = HTTP_204_NO_CONTENT
         firends_qs = user.prof.get_friends().filter(pk=pk)
-        if (firends_qs.exists() and pk != user.pk):
+        if firends_qs.exists() and pk != user.pk:
             Friendship.objects.filter(Q(creator=user, friend=friend) | Q(friend=user, creator=friend)).delete()
             status_code = HTTP_200_OK
         firends_qs = user.prof.get_friends()
@@ -178,8 +178,10 @@ class Friends(APIView):
         assert self.paginator is not None
         return self.paginator.get_paginated_response(data)
 
+
 class Stats(APIView):
-    permission_classes = ((IsAuthenticated,))
+    permission_classes = (IsAuthenticated,)
+
     def get(self, request, pk=None):
         user = request.user
         if pk is not None:
@@ -189,7 +191,8 @@ class Stats(APIView):
 
 
 class TokenV(APIView):
-    permission_classes = ((IsAuthenticated,))
+    permission_classes = (IsAuthenticated,)
+
     def get(self, request):
         user = request.user
         serializer = TokenSerializer({"token": user.prof.token}, many=False)
@@ -212,4 +215,3 @@ class TokenV(APIView):
         user.prof.token = None
         user.prof.save()
         return Response(status=200)
-

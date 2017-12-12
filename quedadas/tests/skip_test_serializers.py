@@ -2,20 +2,15 @@
 import unittest
 
 from django.contrib.auth.models import User
-from rest_framework import status
-from rest_framework.authtoken.models import Token
-from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 
-from populateDB import populate
-from quedadas.models import Profile
-from quedadas.serializers import UserSerializerDetail, UserSerializer
+from quedadas.serializers import UserSerializer
 
 
 class SkeepUserTests(APITestCase):
     def setUp(self):
         pass
-        #populate()
+        # populate()
 
     @unittest.skip("demonstrating skipping")
     def test_serialize_one_user(self):

@@ -22,7 +22,8 @@ class Migration(migrations.Migration):
                 ('answer', models.TextField(max_length=100)),
                 ('postal_code', models.CharField(max_length=5)),
                 (
-                'user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                    'user',
+                    models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
         ),
     ]

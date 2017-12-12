@@ -1,9 +1,5 @@
-from django.db import models
 from django.contrib.auth.models import User
 from django.db import models
-
-
-
 # Create your models here.
 from django.db.models.query_utils import Q
 from django.db.models.signals import post_save
@@ -21,7 +17,7 @@ class Meeting(models.Model):
     public = models.BooleanField(null=False, blank=False)
     level = models.IntegerField(null=True, blank=True)
     latitude = models.CharField(max_length=10, null=False, blank=False)
-    longitude = models.CharField(max_length=10,null=False, blank=False)
+    longitude = models.CharField(max_length=10, null=False, blank=False)
     owner = models.ForeignKey('auth.User', related_name='meetings', on_delete=models.CASCADE)
     participants = models.ManyToManyField(User, related_name='meetings_at')
 
@@ -30,6 +26,7 @@ class Meeting(models.Model):
 
     class Meta:
         ordering = ('created',)
+
 
 class Friendship(models.Model):
     created = models.DateTimeField(auto_now_add=True, editable=False)
@@ -43,19 +40,19 @@ class Friendship(models.Model):
 
 class Tracking(models.Model):
     created = models.DateTimeField(auto_now_add=True)
-    averagespeed = models.FloatField() # m/s
-    distance = models.FloatField() # m
+    averagespeed = models.FloatField()  # m/s
+    distance = models.FloatField()  # m
     steps = models.IntegerField()
-    totalTimeMillis = models.IntegerField() # ms
-    calories = models.FloatField() # kcal
+    totalTimeMillis = models.IntegerField()  # ms
+    calories = models.FloatField()  # kcal
     meeting = models.ForeignKey(Meeting, related_name="tracks", null=False, on_delete=models.CASCADE)
     user = models.ForeignKey(User, related_name="tracks", null=False, on_delete=models.CASCADE)
-
 
     def __str__(self):
         if self.meeting.title:
             return self.meeting.title
         return "No last meeting"
+
 
 class RoutePoint(models.Model):
     latitude = models.FloatField()
@@ -76,30 +73,32 @@ class Chat(models.Model):
     def num_participiants(self):
         return self.listUsersChat.count()
 
+
 @receiver(post_save, sender=Tracking, dispatch_uid="update_statistics")
 def update_stats(sender, instance, **kwargs):
-     stats = instance.user.prof.statistics
-     stats.distance += instance.distance
-     stats.steps += instance.steps
-     stats.totalTimeMillis += instance.totalTimeMillis
-     stats.calories += instance.calories
-     stats.meetingsCompletats += 1
-     stats.lastTracking = instance
-     
-     if stats.maxDistance < instance.distance:
-         stats.maxDistance = instance.distance
-     if stats.maxAverageSpeed < instance.averagespeed:
-         stats.maxAverageSpeed = instance.averagespeed
-     if stats.maxDuration < instance.totalTimeMillis:
-         stats.maxDuration = instance.totalTimeMillis
-         
-     if stats.minDistance > instance.distance or stats.minDistance == 0:
-         stats.minDistance = instance.distance
-     if stats.minAverageSpeed > instance.averagespeed or stats.averagespeed == 0:
-         stats.minAverageSpeed = instance.averagespeed
-     if stats.minDuration > instance.totalTimeMillis or stats.totalTimeMillis == 0 :
-         stats.minDuration = instance.totalTimeMillis
-     stats.save()
+    stats = instance.user.prof.statistics
+    stats.distance += instance.distance
+    stats.steps += instance.steps
+    stats.totalTimeMillis += instance.totalTimeMillis
+    stats.calories += instance.calories
+    stats.meetingsCompletats += 1
+    stats.lastTracking = instance
+
+    if stats.maxDistance < instance.distance:
+        stats.maxDistance = instance.distance
+    if stats.maxAverageSpeed < instance.averagespeed:
+        stats.maxAverageSpeed = instance.averagespeed
+    if stats.maxDuration < instance.totalTimeMillis:
+        stats.maxDuration = instance.totalTimeMillis
+
+    if stats.minDistance > instance.distance or stats.minDistance == 0:
+        stats.minDistance = instance.distance
+    if stats.minAverageSpeed > instance.averagespeed or stats.averagespeed == 0:
+        stats.minAverageSpeed = instance.averagespeed
+    if stats.minDuration > instance.totalTimeMillis or stats.totalTimeMillis == 0:
+        stats.minDuration = instance.totalTimeMillis
+    stats.save()
+
 
 class Statistics(models.Model):
     distance = models.FloatField(default=0)
@@ -119,12 +118,13 @@ class Statistics(models.Model):
     def averagespeed(self):
         if self.totalTimeMillis == 0:
             return 0
-        return float(self.distance/(self.totalTimeMillis/1000))
+        return float(self.distance / (self.totalTimeMillis / 1000))
 
     def __str__(self):
         if self.prof.user.username:
             return self.prof.user.username
         return "Statistic object with no username"
+
 
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='prof')
@@ -139,6 +139,7 @@ class Profile(models.Model):
         user = self.user
         friends = User.objects.filter(Q(friend_set__creator=user) | Q(friendship_creator_set__friend=user))
         return friends.distinct()
+
 
 @receiver(post_save, sender=Profile, dispatch_uid="update_stock_count")
 def init_statistics(sender, instance, **kwargs):
@@ -160,7 +161,6 @@ class Challenge(models.Model):
     accepted = models.BooleanField(default=False, blank=True)
     completed = models.BooleanField(default=False, blank=True)
 
-
     @property
     def creatorDistance(self):
         return self.creator.prof.statistics.distance - self.creatorBase
@@ -175,7 +175,7 @@ class Challenge(models.Model):
         if not self.challengedBase:
             self.challengedBase = self.challenged.prof.statistics.distance
 
-        super(Challenge, self).save( *args, **kwargs)
+        super(Challenge, self).save(*args, **kwargs)
 
     def check_completion(self):
         if self.deadline < timezone.now():
@@ -205,6 +205,7 @@ def update_challenge_statistics(sender, instance, **kwargs):
     challenges_challenged = user.challenged.filter(completed=False)
     for challenge in (challenges_creator | challenges_challenged).distinct():
         challenge.check_completion()
+
 
 @receiver(post_save, sender=Challenge, dispatch_uid="notify_new_challenge")
 def notify_user(sender, instance, **kwargs):

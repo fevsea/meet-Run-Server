@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-import django
 import os
-from datetime import datetime, timedelta, timezone
-from django.utils import timezone
+from datetime import timedelta
+
+import django
 
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "rest.settings")
 django.setup()
@@ -11,7 +11,8 @@ from django.contrib.auth.models import User
 
 User.objects.create_superuser('admin', 'admin@example.com', 'meetnrun')
 
-userA = User.objects.create_user(username='alejandroA', password='alejandroA', first_name="Alejandro", last_name="Agustin")
+userA = User.objects.create_user(username='alejandroA', password='alejandroA', first_name="Alejandro",
+                                 last_name="Agustin")
 Profile(user=userA, question="My question", answer="My answer", postal_code="08181", level=2).save()
 userB = User.objects.create_user(username='javierA', password='javierA', first_name="Javier", last_name="Alemán")
 Profile(user=userB, question="My question", answer="My answer", postal_code="08181", level=3).save()
@@ -27,6 +28,7 @@ userG = User.objects.create_user(username='ericR', password='ericR', first_name=
 Profile(user=userG, question="My question", answer="My answer", postal_code="08034", level=1).save()
 
 from django.utils import timezone
+
 Friendship(creator=userA, friend=userB).save()
 Friendship(creator=userA, friend=userC).save()
 Friendship(creator=userC, friend=userA).save()
@@ -35,14 +37,14 @@ Friendship(creator=userE, friend=userF).save()
 Friendship(creator=userE, friend=userG).save()
 
 meetingA = Meeting(owner=userA, title="Sortida pel marenostrum", public=True, level=3, latitude="41.488576",
-        longitude="2.21284", date=(timezone.now()+timedelta(days=2)))
+                   longitude="2.21284", date=(timezone.now() + timedelta(days=2)))
 meetingA.save()
 meetingA.participants.add(userB)
 
 meetingB = Meeting(owner=userA, title="Guanta", public=True, level=2, latitude="41.388576",
-        longitude="2.11284", date=(timezone.now()+timedelta(days=3)))
+                   longitude="2.11284", date=(timezone.now() + timedelta(days=3)))
 meetingA.save()
 meetingA.participants.add(userB, userC, userD, userE, userF)
 
 meetingC = Meeting(owner=userB, title="N'em a corre per l'eixample", public=False, level=1, latitude="41.378576",
-        longitude="2.01284", date=(timezone.now()+timedelta(days=2))).save()
+                   longitude="2.01284", date=(timezone.now() + timedelta(days=2))).save()

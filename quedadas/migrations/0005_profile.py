@@ -22,7 +22,8 @@ class Migration(migrations.Migration):
                 ('rec_question', models.CharField(blank=True, max_length=30)),
                 ('rec_answer', models.DateField(blank=True, null=True)),
                 (
-                'user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                    'user',
+                    models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
             ],
         ),
     ]
