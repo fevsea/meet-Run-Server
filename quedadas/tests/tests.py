@@ -1,4 +1,5 @@
 import unittest
+from collections import OrderedDict
 
 from django.urls import reverse
 from rest_framework import status
@@ -7,7 +8,7 @@ from django.contrib.auth.models import User
 from quedadas.models import Meeting
 from rest_framework.authtoken.models import Token
 from populateDB import populate
-
+import collections
 
 class MeetingsTests(APITestCase):
     @unittest.skip("demonstrating skipping")
@@ -63,15 +64,15 @@ class MeetingsTests(APITestCase):
             'date': '2017-11-28T10:52:39Z',
             'latitude': '41.388576',
             'longitude': '2.11284',
-            'owner': [{
+            'owner': OrderedDict({
                 'id': 6,
                 'username': 'awaisI',
                 'first_name': 'Awais',
                 'last_name': 'Iqbal',
                 'postal_code': '08034',
                 'question': 'My question',
-                'level': '1'
-            }],
+                'level': 1
+        }),
             'chat' : None
         }
         self.assertEqual(response.data, resp)
