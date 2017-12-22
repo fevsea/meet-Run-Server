@@ -20,7 +20,7 @@ def new_challenge(challenge):
 
 
 def challenge_accepted(challenge):
-    user = challenge.challenged
+    user = challenge.creator
     data = {
         "type": "challenge_accepted",
         "challenge_id": challenge.pk,
