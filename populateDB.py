@@ -10,6 +10,10 @@ from quedadas.models import Meeting, Profile, Friendship
 from django.contrib.auth.models import User
 from django.utils import timezone
 
+def createBasicUser():
+    userE = User.objects.create_user(username='awaisI', password='awaisawais', first_name="Awais", last_name="Iqbal")
+    Profile(user=userE, question="hola?", answer="hola", postal_code="08019", level=1).save()
+
 def populate():
     User.objects.create_superuser('admin', 'admin@example.com', 'meetnrun')
 
