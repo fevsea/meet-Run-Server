@@ -6,7 +6,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
 
-from quedadas.controllers import firebaseCtrl
+from quedadas.controllers import meetingCtrl, firebaseCtrl, challengeCtrl, chatsCtrl, userCtrl
 
 
 class Meeting(models.Model):
@@ -74,32 +74,6 @@ class Chat(models.Model):
         return self.listUsersChat.count()
 
 
-@receiver(post_save, sender=Tracking, dispatch_uid="update_statistics")
-def update_stats(sender, instance, **kwargs):
-    stats = instance.user.prof.statistics
-    stats.distance += instance.distance
-    stats.steps += instance.steps
-    stats.totalTimeMillis += instance.totalTimeMillis
-    stats.calories += instance.calories
-    stats.meetingsCompletats += 1
-    stats.lastTracking = instance
-
-    if stats.maxDistance < instance.distance:
-        stats.maxDistance = instance.distance
-    if stats.maxAverageSpeed < instance.averagespeed:
-        stats.maxAverageSpeed = instance.averagespeed
-    if stats.maxDuration < instance.totalTimeMillis:
-        stats.maxDuration = instance.totalTimeMillis
-
-    if stats.minDistance > instance.distance or stats.minDistance == 0:
-        stats.minDistance = instance.distance
-    if stats.minAverageSpeed > instance.averagespeed or stats.averagespeed == 0:
-        stats.minAverageSpeed = instance.averagespeed
-    if stats.minDuration > instance.totalTimeMillis or stats.totalTimeMillis == 0:
-        stats.minDuration = instance.totalTimeMillis
-    stats.save()
-
-
 class Statistics(models.Model):
     distance = models.FloatField(default=0)
     steps = models.IntegerField(default=0)
@@ -124,6 +98,11 @@ class Statistics(models.Model):
         if self.prof.user.username:
             return self.prof.user.username
         return "Statistic object with no username"
+
+@receiver(post_save, sender=Tracking, dispatch_uid="update_statistics")
+def cupdate_stats(sender, instance, **kwargs):
+    meetingCtrl.update_stats(sender, instance, **kwargs)
+
 
 
 class Profile(models.Model):
