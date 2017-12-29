@@ -6,7 +6,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
 
-from quedadas import firebase
+from quedadas.controllers import firebaseCtrl
 
 
 class Meeting(models.Model):
@@ -64,7 +64,7 @@ class Chat(models.Model):
     chatName = models.TextField(null=False, unique=True)
     listUsersChat = models.ManyToManyField(User, related_name="chats")
     type = models.IntegerField()
-    meeting = models.OneToOneField(Meeting, null=True, blank=True, on_delete=models.CASCADE, related_name="chatR")
+    meeting = models.OneToOneField(Meeting, null=True, blank=True, on_delete=models.CASCADE, related_name="chat_r")
     lastMessage = models.TextField(null=False, blank=True)
     lastMessageUserName = models.IntegerField(null=True, blank=True)
     lastDateTime = models.DateTimeField(null=True, blank=True)
@@ -179,15 +179,15 @@ class Challenge(models.Model):
 
     def check_completion(self):
         if self.deadline < timezone.now():
-            firebase.challenge_finalized(self)
+            firebaseCtrl.challenge_finalized(self)
             self.completed = True
         elif self.challengedDistance >= self.distance:
-            firebase.challenge_won(self, self.challenged)
-            firebase.challenge_lost(self, self.creator)
+            firebaseCtrl.challenge_won(self, self.challenged)
+            firebaseCtrl.challenge_lost(self, self.creator)
             self.completed = True
         elif self.creatorDistance >= self.distance:
-            firebase.challenge_lost(self, self.challenged)
-            firebase.challenge_won(self, self.creator)
+            firebaseCtrl.challenge_lost(self, self.challenged)
+            firebaseCtrl.challenge_won(self, self.creator)
             self.completed = True
         self.save()
 
@@ -195,7 +195,7 @@ class Challenge(models.Model):
         return self.creator.username + " <> " + self.challenged.username
 
     def notify_accepted(self):
-        firebase.challenge_accepted(self)
+        firebaseCtrl.challenge_accepted(self)
 
 
 @receiver(post_save, sender=Tracking, dispatch_uid="update_challenge_statistics")
@@ -209,4 +209,4 @@ def update_challenge_statistics(sender, instance, **kwargs):
 
 @receiver(post_save, sender=Challenge, dispatch_uid="notify_new_challenge")
 def notify_user(sender, instance, **kwargs):
-    firebase.new_challenge(instance)
+    firebaseCtrl.new_challenge(instance)
