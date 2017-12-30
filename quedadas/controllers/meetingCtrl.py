@@ -14,8 +14,8 @@ def update_stats(sender, instance, **kwargs):
         stats.maxDuration = instance.totalTimeMillis
     if stats.minDistance > instance.distance or stats.minDistance == 0:
         stats.minDistance = instance.distance
-    if stats.minAverageSpeed > instance.averagespeed or stats.averagespeed == 0:
+    if stats.minAverageSpeed > instance.averagespeed or stats.minAverageSpeed == 0:
         stats.minAverageSpeed = instance.averagespeed
-    if stats.minDuration > instance.totalTimeMillis or stats.totalTimeMillis == 0:
+    if stats.minDuration > instance.totalTimeMillis or stats.minDuration == 0:
         stats.minDuration = instance.totalTimeMillis
     stats.save()
