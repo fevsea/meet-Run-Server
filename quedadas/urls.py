@@ -22,7 +22,7 @@ urlpatterns = [
     url(r'^users$', user.UserList.as_view(), name='user-list'),
     url(r'^users/(?P<pk>[0-9]+)$', user.UserDetail.as_view(), name='user-detail'),
     url(r'^users/current$', user.CurrentUserView.as_view(), name='current-user'),
-    url(r'^users/login$', user.login),
+    url(r'^users/login$', user.login, name='user-login'),
     url(r'^users/logout$', user.logout),
     url(r'^users/token', user.TokenV.as_view(), name='token'),
     url(r'^users/changePassword$', user.changePassword.as_view(), name='change-password'),

@@ -46,7 +46,15 @@ class UsersTests(APITestCase):
             "answer": "hola",
             "level": 2
         }
-        #self.assertEqual(response.data, resp) #TODO pendiente de ver como ignorar la contraseña
+        self.assertEqual(response.data['id'], 1)
+        self.assertEqual(response.data['username'], 'awaisI')
+        self.assertEqual(response.data['first_name'], 'Awais')
+        self.assertEqual(response.data['last_name'], 'Iqbal')
+        self.assertEqual(response.data['postal_code'], '08019')
+        self.assertEqual(response.data['question'], 'hola?')
+        self.assertEqual(response.data['answer'], 'hola')
+        self.assertEqual(response.data['level'], 2)
+        self.assertIsNotNone(response.data['password'])
 
     def test_register_user_repeated_username(self):
         self.valid_payload = {
@@ -194,3 +202,80 @@ class UsersTests(APITestCase):
             format='json'
         )
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+    def test_get_current_user(self):
+        createBasicUser()
+        self.user = User.objects.get(username='awaisI')
+        token = Token.objects.create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        token.save()
+        response = self.client.get(
+            reverse('current-user'),
+            format='json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        resp = {
+            'id': 1,
+            "username": "awaisI",
+            "first_name": "Awais",
+            "last_name": "Iqbal",
+            "postal_code": "08019",
+            "question": "hola?",
+            "level": 1
+        }
+        self.assertEqual(response.data, resp)
+
+    def test_change_password(self):
+        createBasicUser()
+        self.user = User.objects.get(username='awaisI')
+        token = Token.objects.create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        token.save()
+        self.valid_payload = {
+            "old": "awaisawais",
+            "new": "blabla"
+        }
+
+        response = self.client.post(
+            reverse('change-password'),
+            data=self.valid_payload,
+            format='json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.valid_payload = {
+            "username": "awaisI",
+            "password": "awaisawais"
+        }
+        response = self.client.post(
+            reverse('user-login'),
+            data=self.valid_payload,
+            format='json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_update_get_firebase_token(self):
+        createBasicUser()
+        self.user = User.objects.get(username='awaisI')
+        token = Token.objects.create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        token.save()
+        tok = "14f56ds12g56d1s56f1ds651f56ds1g56ds15f6ds156"
+        self.valid_payload = {
+            "token": tok
+        }
+        response = self.client.post(
+            reverse('token'),
+            data=self.valid_payload,
+            format='json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        response = self.client.get(
+            reverse('token'),
+            format='json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        resp = {
+                'token': tok
+        }
+        self.assertEqual(response.data, resp)
