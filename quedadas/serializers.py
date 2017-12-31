@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from .models import Meeting, Profile, Tracking, RoutePoint, Chat, Statistics, Challenge, Friendship
+from .models import Meeting, Profile, Tracking, RoutePoint, Chat, Statistics, Challenge, Friendship, Zone
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -10,9 +10,13 @@ class UserSerializer(serializers.ModelSerializer):
     answer = serializers.CharField(source='prof.answer')
     level = serializers.IntegerField(source='prof.level')
 
+
     def create(self, validated_data):
         profile_data = validated_data.pop('prof')
         user = User.objects.create(**validated_data)
+        pc = profile_data.get("postal_code")
+        zone, _ = Zone.objects.get_or_create(pk=pc)
+        profile_data["postal_code"] = zone
         Profile.objects.create(user=user, **profile_data)
         return user
 
@@ -31,7 +35,8 @@ class UserSerializerDetail(serializers.ModelSerializer):
         profile_data = validated_data.pop('prof')
 
         instance.prof.question = profile_data.get('question', instance.prof.question)
-        instance.prof.postal_code = profile_data.get('postal_code', instance.prof.postal_code)
+        zip = profile_data.get('postal_code', instance.prof.postal_code.zip)
+        instance.prof.postal_code, _ = Zone.objects.get_or_create(pk=zip)
         instance.username = validated_data.get('username', instance.username)
         instance.last_name = validated_data.get('last_name', instance.last_name)
         instance.first_name = validated_data.get('first_name', instance.first_name)
@@ -147,3 +152,22 @@ class FriendSerializer(serializers.ModelSerializer):
     class Meta:
         model = Friendship
         fields = ('created', 'creator', 'friend', 'accepted')
+
+class ZoneSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Zone
+        fields = ("zip", "average", "distance")
+
+class ZipSerializer(serializers.Serializer):
+    zip = serializers.CharField(read_only=True)
+
+class RankingSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username')
+    first_name = serializers.CharField(source='user.first_name')
+    last_name = serializers.CharField(source='user.last_name')
+    distance = serializers.IntegerField(source='statistics.distance')
+    id = serializers.IntegerField(source='user.pk')
+
+    class Meta:
+        model = Profile
+        fields = ("id", "username", "first_name", "last_name", "postal_code", "distance")

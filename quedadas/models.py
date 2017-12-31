@@ -6,7 +6,16 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
 
-from quedadas.controllers import meetingCtrl, firebaseCtrl, challengeCtrl, chatsCtrl, userCtrl
+from quedadas.controllers import meetingCtrl, firebaseCtrl, rankingsCtrl, chatsCtrl, userCtrl
+
+
+class Zone(models.Model):
+    distance = models.IntegerField(null=False, blank=True, default=0)
+    zip = models.CharField(max_length=5, blank=False, null=False, primary_key=True)
+    average = models.FloatField(default=0)
+
+    def __str__(self):
+        return self.zip
 
 
 class Meeting(models.Model):
@@ -15,7 +24,7 @@ class Meeting(models.Model):
     title = models.CharField(max_length=100, blank=False, null=False)
     description = models.TextField(max_length=500, blank=True)
     public = models.BooleanField(null=False, blank=False)
-    level = models.IntegerField(null=True, blank=True)
+    level = models.IntegerField(null=False, blank=True, default=0)
     latitude = models.CharField(max_length=10, null=False, blank=False)
     longitude = models.CharField(max_length=10, null=False, blank=False)
     owner = models.ForeignKey('auth.User', related_name='meetings', on_delete=models.CASCADE)
@@ -100,8 +109,9 @@ class Statistics(models.Model):
         return "Statistic object with no username"
 
 @receiver(post_save, sender=Tracking, dispatch_uid="update_statistics")
-def cupdate_stats(sender, instance, **kwargs):
+def update_stats(sender, instance, **kwargs):
     meetingCtrl.update_stats(sender, instance, **kwargs)
+    rankingsCtrl.update_zone_ranking(sender, instance, **kwargs)
 
 
 
@@ -109,7 +119,7 @@ class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='prof')
     question = models.CharField(max_length=100, blank=False, null=False)
     answer = models.CharField(max_length=100, blank=False, null=False)
-    postal_code = models.CharField(max_length=5, blank=False, null=False)
+    postal_code = models.ForeignKey(Zone, related_name="members", on_delete=models.CASCADE)
     level = models.IntegerField(null=False, blank=False, default=0)
     statistics = models.OneToOneField(Statistics, on_delete=models.CASCADE, related_name='prof', null=True, blank=True)
     token = models.CharField(null=True, blank=True, max_length=256)
