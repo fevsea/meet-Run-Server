@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.contrib.auth.models import User
 
-from .models import Meeting, Friendship, Tracking, RoutePoint, Statistics
+from .models import Meeting, Friendship, Tracking, RoutePoint, Statistics, Zone
 from .models import Profile
 
 
@@ -38,3 +38,4 @@ admin.site.register(Tracking, TrackingPoint)
 admin.site.register(Meeting)
 admin.site.register(Friendship)
 admin.site.register(Statistics)
+admin.site.register(Zone)
