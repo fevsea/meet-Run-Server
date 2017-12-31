@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
-from rest_framework import generics, permissions, status
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework import generics, permissions, status, filters
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -11,6 +12,10 @@ from quedadas.serializers import ChatSerializer, ChatSerializerCreate
 
 class ChatList(generics.ListCreateAPIView):
     permission_classes = (permissions.IsAuthenticated,)
+    filter_backends = (filters.SearchFilter, DjangoFilterBackend)
+    search_fields = ('chatName',)
+    filter_fields = ('chatName',)
+
 
     def get_queryset(self):
         user = self.request.user
