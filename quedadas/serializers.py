@@ -160,3 +160,14 @@ class ZoneSerializer(serializers.ModelSerializer):
 
 class ZipSerializer(serializers.Serializer):
     zip = serializers.CharField(read_only=True)
+
+class RankingSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username')
+    first_name = serializers.CharField(source='user.first_name')
+    last_name = serializers.CharField(source='user.last_name')
+    distance = serializers.IntegerField(source='statistics.distance')
+    id = serializers.IntegerField(source='user.pk')
+
+    class Meta:
+        model = Profile
+        fields = ("id", "username", "first_name", "last_name", "postal_code", "distance")
