@@ -13,6 +13,7 @@ def api_root(request, format=None):
         'chats': reverse('chat-list', request=request, format=format),
         'challenges': reverse('challenge-list', request=request, format=format),
         'rankings': reverse('rankings-index', request=request, format=format),
+        'trophies': reverse('trophies', request=request, format=format),
         'admin': ''.join(['http://', get_current_site(request).domain, "/admin"]),
         'docs': reverse('docs', request=request, format=format),
     })
