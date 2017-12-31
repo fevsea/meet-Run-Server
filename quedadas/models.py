@@ -24,7 +24,7 @@ class Meeting(models.Model):
     title = models.CharField(max_length=100, blank=False, null=False)
     description = models.TextField(max_length=500, blank=True)
     public = models.BooleanField(null=False, blank=False)
-    level = models.IntegerField(null=True, blank=True)
+    level = models.IntegerField(null=False, blank=True, default=0)
     latitude = models.CharField(max_length=10, null=False, blank=False)
     longitude = models.CharField(max_length=10, null=False, blank=False)
     owner = models.ForeignKey('auth.User', related_name='meetings', on_delete=models.CASCADE)
