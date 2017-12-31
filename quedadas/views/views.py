@@ -22,6 +22,7 @@ def api_root(request, format=None):
 def ranking_root(request, format=None):
     return Response({
         'zone': reverse('ranking-zone', request=request, format=format),
+        'zips': reverse('zip-list', request=request, format=format),
 
     })
 

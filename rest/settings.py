@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'quedadas.apps.QuedadasConfig',
     'rest_framework_swagger',
+    'django_filters',
 ]
 
 MIDDLEWARE = [

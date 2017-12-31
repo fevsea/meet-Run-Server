@@ -44,6 +44,7 @@ urlpatterns = [
     # Ranking
     url(r'^rankings$', views.ranking_root, name="rankings-index"),
     url(r'^rankings/zone', rankings.ZoneList.as_view(), name='ranking-zone'),
+    url(r'^rankings/zip', rankings.ZipList.as_view(), name='zip-list'),
 
 ]
 

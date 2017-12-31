@@ -154,9 +154,9 @@ class FriendSerializer(serializers.ModelSerializer):
         fields = ('created', 'creator', 'friend', 'accepted')
 
 class ZoneSerializer(serializers.ModelSerializer):
-    #average = serializers.ReadOnlyField(source='average')
-
     class Meta:
         model = Zone
         fields = ("zip", "average", "distance")
 
+class ZipSerializer(serializers.Serializer):
+    zip = serializers.CharField(read_only=True)
