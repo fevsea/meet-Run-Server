@@ -1,3 +1,4 @@
+from django.db.models import Count
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, permissions, filters
 from rest_framework.response import Response
@@ -18,6 +19,6 @@ class ZoneList(generics.ListAPIView):
 
 class ZipList(APIView):
     def get(self, request):
-        zips = Zone.objects.only("zip")
+        zips = Zone.objects.only("zip").order_by("zip").annotate(page_count=Count('members')).filter(page_count__gt=0)
         serializer = ZipSerializer(zips, many=True)
         return Response(serializer.data)
