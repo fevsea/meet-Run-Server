@@ -26,9 +26,9 @@ urlpatterns = [
     url(r'^users/logout$', user.logout),
     url(r'^users/token', user.TokenV.as_view(), name='token'),
     url(r'^users/changePassword$', user.changePassword.as_view(), name='change-password'),
-    url(r'^users/friends$', user.Friends.as_view(), name='firends'),
-    url(r'^users/friends/(?P<pk>[0-9]+)$', user.Friends.as_view(), name='add-firends'),
-    url(r'^users/(?P<pk>[0-9]+)/friends$', user.Friends.as_view(), name='priends-pk'),
+    url(r'^users/friends$', user.Friends.as_view()),
+    url(r'^users/friends/(?P<pk>[0-9]+)$', user.Friends.as_view(), name='friends'),
+    url(r'^users/(?P<pk>[0-9]+)/friends$', user.Friends.as_view(), name='friends-pk'),
     url(r'^users/statistics$', user.Stats.as_view(), name='statistics'),
     url(r'^users/(?P<pk>[0-9]+)/statistics$', user.Stats.as_view(), name='statistics-pk'),
 
