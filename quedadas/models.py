@@ -96,6 +96,7 @@ class Statistics(models.Model):
     minDistance = models.FloatField(default=0)
     minAverageSpeed = models.FloatField(default=0)
     minDuration = models.IntegerField(default=0)
+    challenges = models.IntegerField(default=0)
 
     @property
     def averagespeed(self):
@@ -128,6 +129,14 @@ class Profile(models.Model):
         user = self.user
         friends = User.objects.filter(Q(friend_set__creator=user) | Q(friendship_creator_set__friend=user))
         return friends.distinct()
+
+    @property
+    def friend_number(self):
+        user = self.user
+        friends = User.objects.filter(Q(friend_set__accepted=True) | Q(friendship_creator_set__accepted=True))
+        friends = friends.filter(Q(friend_set__creator=user) | Q(friendship_creator_set__friend=user)).distinct()
+        return friends.count()
+
 
 
 @receiver(post_save, sender=Profile, dispatch_uid="update_stock_count")
@@ -173,10 +182,12 @@ class Challenge(models.Model):
         elif self.challengedDistance >= self.distance:
             firebaseCtrl.challenge_won(self, self.challenged)
             firebaseCtrl.challenge_lost(self, self.creator)
+            self.challenged.prof.statistics.challenges += 1
             self.completed = True
         elif self.creatorDistance >= self.distance:
             firebaseCtrl.challenge_lost(self, self.challenged)
             firebaseCtrl.challenge_won(self, self.creator)
+            self.creator.prof.statistics.challenges += 1
             self.completed = True
         self.save()
 

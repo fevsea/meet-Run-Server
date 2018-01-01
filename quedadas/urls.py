@@ -1,7 +1,7 @@
 from django.conf.urls import url
 from rest_framework.urlpatterns import format_suffix_patterns
 
-from quedadas.views import views, user, meeting, chats, challenge, rankings
+from quedadas.views import views, user, meeting, chats, challenge, rankings, trophies
 
 urlpatterns = [
     # Views views
@@ -47,6 +47,10 @@ urlpatterns = [
     url(r'^rankings/zone$', rankings.ZoneList.as_view(), name='ranking-zone'),
     url(r'^rankings/zone/(?P<pk>[0-9]+)$', rankings.ZoneDetail.as_view(), name='zone-detail'),
     url(r'^rankings/zip$', rankings.ZipList.as_view(), name='zip-list'),
+
+    #Tophies
+    url(r'^trophies$', trophies.Stats.as_view(), name="trophies"),
+    url(r'^trophies/(?P<pk>[0-9]+)$', trophies.Stats.as_view(), name="trophies-pk"),
 
 
 ]
