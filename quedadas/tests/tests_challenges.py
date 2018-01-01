@@ -70,7 +70,6 @@ class FriendsTests(APITestCase):
         response2 = self.client.get(
             reverse('challenge-list')
         )
-        print(response2.data[0]['creator'])
         self.assertEqual(response2.data[0]['id'],1)
         resp = {
             'id': 1,
@@ -109,3 +108,29 @@ class FriendsTests(APITestCase):
             reverse('challenge-detail', kwargs={'pk': createdChallengeID})
         )
         self.assertEqual(response2.status_code, status.HTTP_404_NOT_FOUND)  # miramos que existe la solicitud
+
+    def test_no_exists_challenge(self):
+        response2 = self.client.get(
+            reverse('challenge-detail', kwargs={'pk': 1})
+        )
+        self.assertEqual(response2.status_code, status.HTTP_404_NOT_FOUND)  # miramos que existe la solicitud
+
+    def test_userB_no_exists(self):
+        createBasicUser()
+        self.user = User.objects.get(username='awaisI')
+        token = Token.objects.create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        token.save()
+
+        self.valid_payload = {
+            "creator": 1,
+            "challenged": 2,
+            "distance": 3,
+            "deadline": "2018-11-28T10:52:00"
+        }
+        response = self.client.post(
+            reverse('challenge-list'),
+            data=self.valid_payload,
+            format='json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)  # comprobar que se ha creado la solicitud
