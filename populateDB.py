@@ -14,12 +14,14 @@ from django.utils import timezone
     NO CAMBIAR, VARIOS TESTS UTILIZAN LA MISMA LLAMADA
 '''
 def createBasicUser():
+    zoneA, _ = Zone.objects.get_or_create(pk="08019")
     userE = User.objects.create_user(username='awaisI', password='awaisawais', first_name="Awais", last_name="Iqbal")
-    Profile(user=userE, question="hola?", answer="hola", postal_code="08019", level=1).save()
+    Profile(user=userE, question="hola?", answer="hola", postal_code=zoneA, level=1).save()
 
 def createBasicUser2():
+    zoneA, _ = Zone.objects.get_or_create(pk="08019")
     userG = User.objects.create_user(username='ericR', password='ericR', first_name="Eric", last_name="Rodríguez")
-    Profile(user=userG, question="hola?", answer="hola", postal_code="08019", level=1).save()
+    Profile(user=userG, question="hola?", answer="hola", postal_code=zoneA, level=1).save()
 
 def populate():
     zoneA, _ = Zone.objects.get_or_create(pk="08181")
