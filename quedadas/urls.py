@@ -14,9 +14,9 @@ urlpatterns = [
         name="meeting_track"),
     url(r'^users/meetings$', meeting.UserMeeting.as_view(), name='user-meetings'),
     url(r'^users/(?P<pk>[0-9]+)/meetings$', meeting.UserMeeting.as_view(), name='user-meetings-pk'),
-    url(r'^meetings/(?P<pk>[0-9]+)/participants$', meeting.JoinMeeting.as_view(), name="join_meeting"),
+    url(r'^meetings/(?P<pk>[0-9]+)/participants$', meeting.JoinMeeting.as_view(), name="meeting-participants"),
     url(r'^meetings/(?P<pk>[0-9]+)/participants/(?P<usr>[0-9]+)$', meeting.JoinMeeting.as_view(),
-        name="join_meeting_pk"),
+        name="meeting-participants-user-pk"),
 
     # View user
     url(r'^users$', user.UserList.as_view(), name='user-list'),

@@ -7,6 +7,7 @@ from rest_framework.test import APITestCase
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 from populateDB import createBasicUser
+from populateDB import createBasicUser2
 from populateDB import createBasicUserMeeting
 
 
@@ -482,3 +483,124 @@ class MeetingsTests(APITestCase):
              )
         ])
         self.assertEqual(response.data, resp)
+
+    #@unittest.skip
+    def test_participar_automaticamente(self):
+        createBasicUserMeeting()
+        self.user = User.objects.get(username='awaisI')
+        token = Token.objects.create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+
+        response = self.client.get(
+            reverse('meeting-participants', kwargs={'pk': 1})
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 1)
+        resp = OrderedDict([
+            ('count', 1),
+            ('next', None),
+            ('previous', None),
+            ('results',
+             [
+                 OrderedDict([  # cada usuario es un orderedDict
+                     ('id', 1),
+                     ('username', 'awaisI'),
+                     ('first_name', 'Awais'),
+                     ('last_name', 'Iqbal'),
+                     ('postal_code', '08019'),
+                     ('question', 'hola?'),
+                     ('level', 1)
+                 ])
+             ]
+             )
+        ])
+        self.assertEqual(response.data, resp)
+
+
+    def test_join_leave_meeting(self):
+        createBasicUserMeeting()
+        createBasicUser2()
+        '''TODO borrar todo desde aqui...(falta que el ser añada el creador automaticamente)'''
+        '''self.user = User.objects.get(username='awaisI')
+        token = Token.objects.create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+
+        response = self.client.post(
+            reverse('meeting-participants-user-pk', kwargs={'pk': 1, 'usr':1})
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)'''
+        '''TODO hasta aqui...'''
+
+        self.user = User.objects.get(username='ericR')
+        token = Token.objects.create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+
+
+        response = self.client.post(
+            reverse('meeting-participants-user-pk', kwargs={'pk': 1, 'usr' : 2})
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        response = self.client.get(
+            reverse('meeting-participants', kwargs={'pk': 1})
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        resp = OrderedDict([
+            ('count', 2),
+            ('next', None),
+            ('previous', None),
+            ('results',
+             [  # array de usuarios
+                 OrderedDict([  # cada usuario es un orderedDict
+                     ('id', 1),
+                     ('username', 'awaisI'),
+                     ('first_name', 'Awais'),
+                     ('last_name', 'Iqbal'),
+                     ('postal_code', '08019'),
+                     ('question', 'hola?'),
+                     ('level', 1)
+                 ]),
+                 OrderedDict([
+                     ('id', 2),
+                     ('username', 'ericR'),
+                     ('first_name', 'Eric'),
+                     ('last_name', 'Rodríguez'),
+                     ('postal_code', '08019'),
+                     ('question', 'hola?'),
+                     ('level', 1)
+                 ])
+             ]
+             )
+        ])
+        self.assertEqual(response.data, resp)
+
+        response = self.client.delete(
+            reverse('meeting-participants-user-pk', kwargs={'pk': 1, 'usr': 1})
+        )
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        response = self.client.get(
+            reverse('meeting-participants', kwargs={'pk': 1})
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 1)
+        resp = OrderedDict([
+            ('count', 1),
+            ('next', None),
+            ('previous', None),
+            ('results',
+             [
+                 OrderedDict([  # cada usuario es un orderedDict
+                     ('id', 1),
+                     ('username', 'awaisI'),
+                     ('first_name', 'Awais'),
+                     ('last_name', 'Iqbal'),
+                     ('postal_code', '08019'),
+                     ('question', 'hola?'),
+                     ('level', 1)
+                 ])
+             ]
+             )
+        ])
+        self.assertEqual(response.data, resp)
+
+
