@@ -23,6 +23,14 @@ def createBasicUser2():
     userG = User.objects.create_user(username='ericR', password='ericR', first_name="Eric", last_name="Rodríguez")
     Profile(user=userG, question="hola?", answer="hola", postal_code=zoneA, level=1).save()
 
+def createBasicUserMeeting():
+    zoneA, _ = Zone.objects.get_or_create(pk="08019")
+    userE = User.objects.create_user(username='awaisI', password='awaisawais', first_name="Awais", last_name="Iqbal")
+    Profile(user=userE, question="hola?", answer="hola", postal_code=zoneA, level=1).save()
+    meetingA = Meeting(owner=userE, description="bla bla bla", title="Testing Meeting", public=False, level=1, latitude="41.388576",
+                       longitude="2.11284", date="2017-11-28T10:52:39")
+    meetingA.save()
+
 def populate():
     zoneA, _ = Zone.objects.get_or_create(pk="08181")
     zoneB, _ = Zone.objects.get_or_create(pk="08034")
