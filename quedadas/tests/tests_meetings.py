@@ -604,3 +604,94 @@ class MeetingsTests(APITestCase):
         self.assertEqual(response.data, resp)
 
 
+    def test_add_meeting_tracking(self):
+        createBasicUserMeeting()
+        self.user = User.objects.get(username='awaisI')
+        token = Token.objects.create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        response = self.client.get(
+            reverse('meeting-track', kwargs={'user': 1,'meeting':1})
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND) #comprobamos que no hay ningun tracking
+
+        self.valid_payload = {
+            "averagespeed": 19635.94,
+            "distance": 221159.58,
+            "steps": 0,
+            "totalTimeMillis": 11263,
+            "calories": 0.0,
+            "routePoints": [
+                {"latitude": 3.0 , "longitude" : 41.2000},
+                {"latitude": 5.0, "longitude": 41.2000}
+            ]
+        }
+
+        response = self.client.post(
+            reverse('meeting-track', kwargs={'user': 1,'meeting':1}),
+            data=self.valid_payload,
+            format='json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED) #comprobamos que se ha creado
+        resp = {
+            "user" : 1,
+            "meeting" : 1,
+            "averagespeed": 19635.94,
+            "distance": 221159.58,
+            "steps": 0,
+            "totalTimeMillis": 11263,
+            "calories": 0.0,
+            "routePoints": [
+                OrderedDict([
+                    ('latitude',3.0),
+                    ('longitude',41.2000)
+                ]),
+                OrderedDict([
+                    ('latitude', 5.0),
+                    ('longitude', 41.2000)
+                ])
+            ]
+        }
+        self.assertEqual(response.data, resp) #check el contenido del tracking
+
+        response = self.client.get(
+            reverse('meeting-track', kwargs={'user': 1, 'meeting': 1})
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)  # comprobamos que no hay ningun tracking
+
+        resp = {
+            "user": 1,
+            "meeting": 1,
+            "averagespeed": 19635.94,
+            "distance": 221159.58,
+            "steps": 0,
+            "totalTimeMillis": 11263,
+            "calories": 0.0,
+            "routePoints": [
+                OrderedDict([
+                    ('latitude', 3.0),
+                    ('longitude', 41.2000)
+                ]),
+                OrderedDict([
+                    ('latitude', 5.0),
+                    ('longitude', 41.2000)
+                ])
+            ]
+        }
+        self.assertEqual(response.data, resp)  # check el contenido del tracking
+
+        response = self.client.delete(
+            reverse('meeting-track', kwargs={'user': 1, 'meeting': 1}),
+            data=self.valid_payload,
+            format='json'
+        )
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)  # comprobamos que se ha borrado
+
+        response = self.client.get(
+            reverse('meeting-track', kwargs={'user': 1, 'meeting': 1})
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)  # comprobamos que no hay ningun tracking
+
+
+
+
+
