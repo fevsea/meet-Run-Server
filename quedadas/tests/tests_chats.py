@@ -19,48 +19,182 @@ class MeetingsTests(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
         token.save()'''
 
-    def test_create_valid_meeting(self):
-        self.valid_payload = {
-            "title": "Testing Meeting",
-            "description": "bla bla bla",
-            "public": False,
-            "level": 1,
-            "date": "2017-11-28T10:52:39",
-            "latitude": "41.388576",
-            "longitude": "2.11284",
-            "chat": None
-        }
-        createBasicUser()
+    def test_create_valid_chat_with_meeting(self):
+        createBasicUserMeeting()
+        createBasicUser2()
         self.user = User.objects.get(username='awaisI')
         token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
-        response = self.client.post(
-            reverse('meeting_list'),
-            data=self.valid_payload,
-            format='json'
+
+        ''' COmprobamos que la lista este vacia'''
+        response = self.client.get(
+            reverse('chat-list')
         )
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        resp = {
-            'id': 1,
-            'title': 'Testing Meeting',
-            'description': 'bla bla bla',
-            'public': False,
-            'level': 1,
-            'date': '2017-11-28T10:52:39Z',
-            'latitude': '41.388576',
-            'longitude': '2.11284',
-            'owner': OrderedDict({
-                'id': 1,
-                'username': 'awaisI',
-                'first_name': 'Awais',
-                'last_name': 'Iqbal',
-                'postal_code': '08019',
-                'question': 'hola?',
-                'level': 1
-        }),
-            'chat' : None
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 0) #comprobamos que no hay ningún chat en la base de datos
+
+        self.valid_payload = {
+            "chatName": "Chat1",
+            "listUsersChat": [1,2],
+            "type": 1,
+            "meeting": 1,
+            "lastMessage": "Hola",
+            "lastMessageUserName": 0,
+            "lastDateTime": "2017-11-28T10:52:39"
         }
-        self.assertEqual(response.data, resp)
+        ''' Creamos un chat'''
+        response = self.client.post(
+            reverse('chat-list'),
+            data=self.valid_payload
+        )
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED) #comprobamos la respuesta de que se ha creado
+        resp = {
+            'pk': 1,
+            'chatName': 'Chat1',
+            'listUsersChat': [
+                OrderedDict([  # cada usuario es un orderedDict
+                    ('id', 1),
+                    ('username', 'awaisI'),
+                    ('first_name', 'Awais'),
+                    ('last_name', 'Iqbal'),
+                    ('postal_code', '08019'),
+                    ('question', 'hola?'),
+                    ('level', 1),
+                ]),
+                OrderedDict([
+                    ('id', 2),
+                    ('username', 'ericR'),
+                    ('first_name', 'Eric'),
+                    ('last_name', 'Rodríguez'),
+                    ('postal_code', '08019'),
+                    ('question', 'hola?'),
+                    ('level', 1)
+                ])
+            ],
+            'type': 1,
+            'meeting': OrderedDict([  # cada usuario es un orderedDict
+                     ('id', 1),
+                     ('title', 'Testing Meeting'),
+                     ('description', 'bla bla bla'),
+                     ('public', False),
+                     ('level', 1),
+                     ('date', '2017-11-28T10:52:39Z'),
+                     ('latitude', '41.388576'),
+                     ('longitude', '2.11284'),
+                     ('owner',
+                        OrderedDict([  # cada usuario es un orderedDict
+                            ('id', 1),
+                            ('username', 'awaisI'),
+                            ('first_name', 'Awais'),
+                            ('last_name', 'Iqbal'),
+                            ('postal_code', '08019'),
+                            ('question', 'hola?'),
+                            ('level', 1)
+                        ])
+                     ),
+                     ('chat', 1)
+                 ]),
+            'lastMessage': 'Hola',
+            'lastMessageUserName': 0,
+            'lastDateTime': '2017-11-28T10:52:39Z'
+        }
+        self.assertEqual(response.data, resp) #comrpobamos el formato retornado en Json
+
+        ''' Miramos que se pueda acceder al chat'''
+        response = self.client.get (
+            reverse('chat-detail', kwargs={'pk': 1})
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data, resp) #comprobamos que la respuesta sea correcta
+
+        ''' Miramos la lista con 1 chat'''
+        response = self.client.get(
+            reverse('chat-list')
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 1)  # comprobamos que no hay ningún chat en la base de datos
+
+        resp = OrderedDict([
+            ('count',1),
+            ('next',None),
+            ('previous', None),
+            ('results',[
+                OrderedDict([
+                    ('pk', 1),
+                    ('chatName', 'Chat1'),
+                    ('listUsersChat', [
+                        OrderedDict([  # cada usuario es un orderedDict
+                            ('id', 1),
+                            ('username', 'awaisI'),
+                            ('first_name', 'Awais'),
+                            ('last_name', 'Iqbal'),
+                            ('postal_code', '08019'),
+                            ('question', 'hola?'),
+                            ('level', 1),
+                        ]),
+                        OrderedDict([
+                            ('id', 2),
+                            ('username', 'ericR'),
+                            ('first_name', 'Eric'),
+                            ('last_name', 'Rodríguez'),
+                            ('postal_code', '08019'),
+                            ('question', 'hola?'),
+                            ('level', 1)
+                        ])
+                    ]),
+                    ('type', 1),
+                    ( 'meeting',
+                        OrderedDict([  # cada usuario es un orderedDict
+                            ('id', 1),
+                            ('title', 'Testing Meeting'),
+                            ('description', 'bla bla bla'),
+                            ('public', False),
+                            ('level', 1),
+                            ('date', '2017-11-28T10:52:39Z'),
+                            ('latitude', '41.388576'),
+                            ('longitude', '2.11284'),
+                            ('owner',
+                                OrderedDict([  # cada usuario es un orderedDict
+                                    ('id', 1),
+                                    ('username', 'awaisI'),
+                                    ('first_name', 'Awais'),
+                                    ('last_name', 'Iqbal'),
+                                    ('postal_code', '08019'),
+                                    ('question', 'hola?'),
+                                    ('level', 1)
+                                ])
+                            ),
+                            ('chat', 1)
+                        ])
+                    ),
+                    ('lastMessage', 'Hola'),
+                    ('lastMessageUserName', 0),
+                    ('lastDateTime', '2017-11-28T10:52:39Z')
+
+                ])]
+            )
+        ]) #respuesta esperada solicitando la lista
+        self.assertEqual(response.data,resp) #comprobamos los campos que se devuelven
+        ''' Borramos el chat'''
+        response = self.client.delete(
+            reverse('chat-detail', kwargs={'pk': 1})
+        )
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)  # comprobamos la respuesta de que se ha creado
+
+        ''' No se encuentra el chat'''
+        response = self.client.get(
+            reverse('chat-detail', kwargs={'pk': 1})
+        )
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+        ''' Miramos que la lista este vacia'''
+        response = self.client.get(
+            reverse('chat-list')
+        )
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 0)  # comprobamos que no hay ningún chat en la base de datos
+
+
 
     def test_create_empty_meeting(self):
         self.valid_payload = {
@@ -483,213 +617,4 @@ class MeetingsTests(APITestCase):
              )
         ])
         self.assertEqual(response.data, resp)
-
-    #@unittest.skip
-    def test_participar_automaticamente(self):
-        createBasicUserMeeting()
-        self.user = User.objects.get(username='awaisI')
-        token = Token.objects.create(user=self.user)
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
-
-        response = self.client.get(
-            reverse('meeting-participants', kwargs={'pk': 1})
-        )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['count'], 1)
-        resp = OrderedDict([
-            ('count', 1),
-            ('next', None),
-            ('previous', None),
-            ('results',
-             [
-                 OrderedDict([  # cada usuario es un orderedDict
-                     ('id', 1),
-                     ('username', 'awaisI'),
-                     ('first_name', 'Awais'),
-                     ('last_name', 'Iqbal'),
-                     ('postal_code', '08019'),
-                     ('question', 'hola?'),
-                     ('level', 1)
-                 ])
-             ]
-             )
-        ])
-        self.assertEqual(response.data, resp)
-
-    def test_join_leave_meeting(self):
-        createBasicUserMeeting()
-        createBasicUser2()
-        '''TODO borrar todo desde aqui...(falta que el ser añada el creador automaticamente)'''
-        '''self.user = User.objects.get(username='awaisI')
-        token = Token.objects.create(user=self.user)
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
-
-        response = self.client.post(
-            reverse('meeting-participants-user-pk', kwargs={'pk': 1, 'usr':1})
-        )
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)'''
-        '''TODO hasta aqui...'''
-
-        self.user = User.objects.get(username='ericR')
-        token = Token.objects.create(user=self.user)
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
-
-
-        response = self.client.post(
-            reverse('meeting-participants-user-pk', kwargs={'pk': 1, 'usr' : 2})
-        )
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        response = self.client.get(
-            reverse('meeting-participants', kwargs={'pk': 1})
-        )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        resp = OrderedDict([
-            ('count', 2),
-            ('next', None),
-            ('previous', None),
-            ('results',
-             [  # array de usuarios
-                 OrderedDict([  # cada usuario es un orderedDict
-                     ('id', 1),
-                     ('username', 'awaisI'),
-                     ('first_name', 'Awais'),
-                     ('last_name', 'Iqbal'),
-                     ('postal_code', '08019'),
-                     ('question', 'hola?'),
-                     ('level', 1)
-                 ]),
-                 OrderedDict([
-                     ('id', 2),
-                     ('username', 'ericR'),
-                     ('first_name', 'Eric'),
-                     ('last_name', 'Rodríguez'),
-                     ('postal_code', '08019'),
-                     ('question', 'hola?'),
-                     ('level', 1)
-                 ])
-             ]
-             )
-        ])
-        self.assertEqual(response.data, resp)
-
-        response = self.client.delete(
-            reverse('meeting-participants-user-pk', kwargs={'pk': 1, 'usr': 1})
-        )
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
-
-        response = self.client.get(
-            reverse('meeting-participants', kwargs={'pk': 1})
-        )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['count'], 1)
-        resp = OrderedDict([
-            ('count', 1),
-            ('next', None),
-            ('previous', None),
-            ('results',
-             [
-                 OrderedDict([  # cada usuario es un orderedDict
-                     ('id', 1),
-                     ('username', 'awaisI'),
-                     ('first_name', 'Awais'),
-                     ('last_name', 'Iqbal'),
-                     ('postal_code', '08019'),
-                     ('question', 'hola?'),
-                     ('level', 1)
-                 ])
-             ]
-             )
-        ])
-        self.assertEqual(response.data, resp)
-
-    def test_add_get_delete_meeting_tracking(self):
-        createBasicUserMeeting()
-        self.user = User.objects.get(username='awaisI')
-        token = Token.objects.create(user=self.user)
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
-        response = self.client.get(
-            reverse('meeting-track', kwargs={'user': 1,'meeting':1})
-        )
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND) #comprobamos que no hay ningun tracking
-
-        self.valid_payload = {
-            "averagespeed": 19635.94,
-            "distance": 221159.58,
-            "steps": 0,
-            "totalTimeMillis": 11263,
-            "calories": 0.0,
-            "routePoints": [
-                {"latitude": 3.0 , "longitude" : 41.2000},
-                {"latitude": 5.0, "longitude": 41.2000}
-            ]
-        }
-
-        response = self.client.post(
-            reverse('meeting-track', kwargs={'user': 1,'meeting':1}),
-            data=self.valid_payload,
-            format='json'
-        )
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED) #comprobamos que se ha creado
-        resp = {
-            "user" : 1,
-            "meeting" : 1,
-            "averagespeed": 19635.94,
-            "distance": 221159.58,
-            "steps": 0,
-            "totalTimeMillis": 11263,
-            "calories": 0.0,
-            "routePoints": [
-                OrderedDict([
-                    ('latitude',3.0),
-                    ('longitude',41.2000)
-                ]),
-                OrderedDict([
-                    ('latitude', 5.0),
-                    ('longitude', 41.2000)
-                ])
-            ]
-        }
-        self.assertEqual(response.data, resp) #check el contenido del tracking
-
-        response = self.client.get(
-            reverse('meeting-track', kwargs={'user': 1, 'meeting': 1})
-        )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)  # comprobamos que no hay ningun tracking
-
-        resp = {
-            "user": 1,
-            "meeting": 1,
-            "averagespeed": 19635.94,
-            "distance": 221159.58,
-            "steps": 0,
-            "totalTimeMillis": 11263,
-            "calories": 0.0,
-            "routePoints": [
-                OrderedDict([
-                    ('latitude', 3.0),
-                    ('longitude', 41.2000)
-                ]),
-                OrderedDict([
-                    ('latitude', 5.0),
-                    ('longitude', 41.2000)
-                ])
-            ]
-        }
-        self.assertEqual(response.data, resp)  # check el contenido del tracking
-
-        response = self.client.delete(
-            reverse('meeting-track', kwargs={'user': 1, 'meeting': 1}),
-            data=self.valid_payload,
-            format='json'
-        )
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)  # comprobamos que se ha borrado
-
-        response = self.client.get(
-            reverse('meeting-track', kwargs={'user': 1, 'meeting': 1})
-        )
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)  # comprobamos que no hay ningun tracking
-
-
-
-
 
