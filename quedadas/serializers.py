@@ -171,11 +171,3 @@ class RankingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = ("id", "username", "first_name", "last_name", "postal_code", "distance")
-
-class ThrophySerializer(serializers.ModelSerializer):
-    level = serializers.IntegerField(source='prof.level')
-    friends = serializers.IntegerField(source='prof.friend_number')
-
-    class Meta:
-        model = Statistics
-        fields = ("distance", "totalTimeMillis", "meetingsCompletats", "maxDistance", "level", "steps", "challenges", "friends")

@@ -77,3 +77,12 @@ def friend_accepted(friendship):
         "friend_name": friendship.friend.username
     }
     notify_user(user, data)
+
+
+def trophy_obtained(stats, name):
+    user = stats.prof.user
+    data = {
+        "type": "new_trophy",
+        "trophy_name": name
+    }
+    notify_user(user, data)

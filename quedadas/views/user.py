@@ -15,7 +15,7 @@ from rest_framework.status import HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN, HTT
     HTTP_202_ACCEPTED, HTTP_201_CREATED, HTTP_204_NO_CONTENT
 from rest_framework.views import APIView
 
-from quedadas.controllers import firebaseCtrl
+from quedadas.controllers import firebaseCtrl, trophyCtrl
 from quedadas.models import Friendship
 from quedadas.permissions import IsOwnerOrReadOnly
 from quedadas.serializers import UserSerializer, UserSerializerDetail, ChangePassword, StatsSerializer, \
@@ -133,6 +133,7 @@ class Friends(APIView):
                 friendshipI.accepted = True
                 friendshipI.save()
                 firebaseCtrl.friend_accepted(friendshipI)
+                trophyCtrl.check_friends(user)
                 status_code = HTTP_201_CREATED
 
         firends_qs = Friendship.objects.filter(Q(creator=user, friend=friend) | Q(friend=user, creator=friend))
