@@ -6,7 +6,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
 
-from quedadas.controllers import meetingCtrl, firebaseCtrl, rankingsCtrl, chatsCtrl, userCtrl
+from quedadas.controllers import meetingCtrl, firebaseCtrl, rankingsCtrl, trophyCtrl
 
 
 class Zone(models.Model):
@@ -130,6 +130,13 @@ class Profile(models.Model):
         friends = User.objects.filter(Q(friend_set__creator=user) | Q(friendship_creator_set__friend=user))
         return friends.distinct()
 
+    def save(self, *args, **kwargs):
+        old = Profile.objects.get(pk=self.pk).level
+        new = self.level
+        if old != new:
+            trophyCtrl.check_level(self.statistics, old, new)
+        super(Profile, self).save(*args, **kwargs)
+
     @property
     def friend_number(self):
         user = self.user
@@ -182,11 +189,15 @@ class Challenge(models.Model):
         elif self.challengedDistance >= self.distance:
             firebaseCtrl.challenge_won(self, self.challenged)
             firebaseCtrl.challenge_lost(self, self.creator)
+            stats = self.challenged.prof.statistics
+            trophyCtrl.check_challenges(stats, stats.challenges, stats.challenges + 1)
             self.challenged.prof.statistics.challenges += 1
             self.completed = True
         elif self.creatorDistance >= self.distance:
             firebaseCtrl.challenge_lost(self, self.challenged)
             firebaseCtrl.challenge_won(self, self.creator)
+            stats = self.creator.prof.statistics
+            trophyCtrl.check_challenges(stats, stats.challenges, stats.challenges + 1)
             self.creator.prof.statistics.challenges += 1
             self.completed = True
         self.save()
