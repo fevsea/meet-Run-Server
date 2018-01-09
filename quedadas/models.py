@@ -75,7 +75,7 @@ class Chat(models.Model):
     type = models.IntegerField()
     meeting = models.OneToOneField(Meeting, null=True, blank=True, on_delete=models.CASCADE, related_name="chat_r")
     lastMessage = models.TextField(null=False, blank=True)
-    lastMessageUserName = models.IntegerField(null=True, blank=True)
+    lastMessageUserName = models.TextField(null=True, blank=True)
     lastDateTime = models.DateTimeField(null=True, blank=True)
 
     @property
