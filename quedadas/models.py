@@ -129,7 +129,7 @@ class Profile(models.Model):
 
     def get_friends(self):
         user = self.user
-        friends = User.objects.filter(Q(friend_set__creator=user) | Q(friendship_creator_set__friend=user))
+        friends = User.objects.filter(Q(friend_set__creator=user) | Q(friendship_creator_set__friend=user)).filter(friend_set__accepted=True)
         return friends.distinct()
 
     def save(self, *args, **kwargs):
@@ -223,3 +223,11 @@ def update_challenge_statistics(sender, instance, **kwargs):
 @receiver(post_save, sender=Challenge, dispatch_uid="notify_new_challenge")
 def notify_user(sender, instance, **kwargs):
     firebaseCtrl.new_challenge(instance)
+
+class Feed(object):
+    def __init__(self, meeting, type, date, friend=None, tracking=None):
+        self.meeting = meeting
+        self.type = type
+        self.friend = friend
+        self.tracking = tracking
+        self.date = date

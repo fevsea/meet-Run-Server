@@ -53,6 +53,10 @@ urlpatterns = [
     url(r'^trophies$', trophies.Stats.as_view(), name="trophies"),
     url(r'^trophies/(?P<pk>[0-9]+)$', trophies.Stats.as_view(), name="trophies-pk"),
 
+    #Feed
+    url(r'^feed/(?P<pk>[0-9]+)$', user.Feed.as_view(), name="feed-pk"),
+    url(r'^feed$', user.Feed.as_view(), name="feed"),
+
 
 ]
 
