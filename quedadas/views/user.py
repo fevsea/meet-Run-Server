@@ -15,7 +15,7 @@ from rest_framework.status import HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN, HTT
     HTTP_202_ACCEPTED, HTTP_201_CREATED, HTTP_204_NO_CONTENT
 from rest_framework.views import APIView
 
-from quedadas.controllers import firebaseCtrl, trophyCtrl
+from quedadas.controllers import firebaseCtrl, trophyCtrl, userCtrl
 from quedadas.models import Friendship
 from quedadas.permissions import IsOwnerOrReadOnly
 from quedadas.serializers import UserSerializer, UserSerializerDetail, ChangePassword, StatsSerializer, \
@@ -216,3 +216,14 @@ class TokenV(APIView):
         user.prof.token = None
         user.prof.save()
         return Response(status=200)
+
+class Ban(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def post(self, request, pk=None):
+        if pk is None:
+            pk = request.user.pk
+        user = get_object_or_404(User, pk=pk)
+        userCtrl.ban_request(user)
+
+

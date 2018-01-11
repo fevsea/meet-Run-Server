@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from rest_framework import permissions
+from rest_framework.generics import get_object_or_404
 
 from quedadas.models import Meeting
 
@@ -21,3 +22,11 @@ class IsOwnerOrReadOnly(permissions.BasePermission):
         if isinstance(obj, User):
             return obj == request.user
         return False
+
+class IsNotBaned(permissions.BasePermission):
+    def has_permission(self, request, view):
+        if request.method != "POST":
+            return True
+        user = request.user
+        return user.prof.ban_date is None
+

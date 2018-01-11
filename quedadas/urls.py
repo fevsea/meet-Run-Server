@@ -31,6 +31,7 @@ urlpatterns = [
     url(r'^users/(?P<pk>[0-9]+)/friends$', user.Friends.as_view(), name='friends-pk'),
     url(r'^users/statistics$', user.Stats.as_view(), name='statistics'),
     url(r'^users/(?P<pk>[0-9]+)/statistics$', user.Stats.as_view(), name='statistics-pk'),
+    url(r'^users/(?P<pk>[0-9]+)/ban', user.Ban.as_view(), name='ban-pk'),
 
     # Chats
     url(r'^chats$', chats.ChatList.as_view(), name='chat-list'),
