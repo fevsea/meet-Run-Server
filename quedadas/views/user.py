@@ -224,6 +224,8 @@ class Ban(APIView):
         if pk is None:
             pk = request.user.pk
         user = get_object_or_404(User, pk=pk)
-        userCtrl.ban_request(user)
+        if request.user in user.prof.ban_count:
+            return Response(status=403)
+        userCtrl.ban_request(request.user, user)
 
 
