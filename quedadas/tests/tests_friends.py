@@ -58,13 +58,13 @@ class FriendsTests(APITestCase):
             reverse('friends', kwargs={'pk': 1}),
             format='json'
         )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)  # comprobar que se ha borrado
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)  # comprobar que se ha borrado
 
         response2 = self.client.get(
             reverse('friends', kwargs={'pk': 1}),
             data={'accepted': True}
         )
-        self.assertEqual(response2.data['count'], 0)  # comprobar que se ha aceptado la solicitud
+        self.assertEqual(response2.data['count'], 1)  # comprobar que se ha aceptado la solicitud
 
         response2 = self.client.get(
             reverse('friends', kwargs={'pk': 1}),
