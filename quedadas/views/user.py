@@ -44,8 +44,7 @@ class UserDetail(generics.RetrieveUpdateDestroyAPIView):
 class CurrentUserView(APIView):
     permission_classes = (permissions.IsAuthenticated,)
 
-    @staticmethod
-    def get(request):
+    def get(self, request):
         serializer = UserSerializerDetail(request.user)
         return Response(serializer.data)
 
@@ -116,8 +115,7 @@ class Friends(APIView):
         serializer = UserSerializerDetail(friends_qs, many=True)
         return Response(serializer.data)
 
-    @staticmethod
-    def post(request, pk=None):
+    def post(self, request, pk=None):
         user = request.user
         friend = get_object_or_404(User, pk=pk)
 
@@ -144,8 +142,7 @@ class Friends(APIView):
         serializer = FriendSerializer(firends_qs, many=True)
         return Response(serializer.data, status_code)
 
-    @staticmethod
-    def delete(request, pk=None):
+    def delete(self, request, pk=None):
         user = request.user
         friend = get_object_or_404(User, pk=pk)
         status_code = HTTP_204_NO_CONTENT
@@ -188,8 +185,7 @@ class Friends(APIView):
 class Stats(APIView):
     permission_classes = (IsAuthenticated,)
 
-    @staticmethod
-    def get(request, pk=None):
+    def get(self, request, pk=None):
         user = request.user
         if pk is not None:
             user = get_object_or_404(User, pk=pk)
@@ -200,14 +196,12 @@ class Stats(APIView):
 class TokenV(APIView):
     permission_classes = (IsAuthenticated,)
 
-    @staticmethod
-    def get(request):
+    def get(self, request):
         user = request.user
         serializer = TokenSerializer({"token": user.prof.token}, many=False)
         return Response(serializer.data)
 
-    @staticmethod
-    def post(request):
+    def post(self, request):
         user = request.user
         data = JSONParser().parse(request)
         serializer = TokenSerializer(data=data)
@@ -219,8 +213,7 @@ class TokenV(APIView):
             return JsonResponse(serializer.data)
         return JsonResponse(serializer.errors, status=400)
 
-    @staticmethod
-    def delete(request):
+    def delete(self, request):
         user = request.user
         user.prof.token = None
         user.prof.save()
@@ -230,8 +223,7 @@ class TokenV(APIView):
 class Ban(APIView):
     permission_classes = (IsAuthenticated,)
 
-    @staticmethod
-    def post(request, pk=None):
+    def post(self, request, pk=None):
         status = 200
         if pk is None:
             pk = request.user.pk

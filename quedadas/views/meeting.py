@@ -105,7 +105,7 @@ class JoinMeeting(APIView):
         super().__init__(**kwargs)
         self._paginator = self.pagination_class()
 
-    def get(self, pk):
+    def get(self, request, pk):
         meeting = get_object_or_404(Meeting, pk=pk)
         attendences = meeting.participants.all()
         page = self.paginate_queryset(attendences)
@@ -116,8 +116,7 @@ class JoinMeeting(APIView):
         serializer = UserSerializerDetail(attendences, many=True)
         return Response(serializer.data)
 
-    @staticmethod
-    def post(request, pk, usr=None):
+    def post(self, request, pk, usr=None):
         user = request.user
         if usr is not None:
             user = get_object_or_404(User, pk=usr)
@@ -127,8 +126,7 @@ class JoinMeeting(APIView):
         meeting.save()
         return Response(status=status_code)
 
-    @staticmethod
-    def delete(request, pk, usr):
+    def delete(self, request, pk, usr):
         user = request.user
         if usr is not None:
             user = get_object_or_404(User, usr)

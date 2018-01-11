@@ -35,8 +35,7 @@ class UserList(generics.ListAPIView):
 
 
 class ZipList(APIView):
-    @staticmethod
-    def get():
+    def get(self):
         zips = Zone.objects.only("zip").order_by("zip").annotate(page_count=Count('members')).filter(page_count__gt=0)
         serializer = ZipSerializer(zips, many=True)
         return Response(serializer.data)

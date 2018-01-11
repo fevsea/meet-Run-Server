@@ -46,8 +46,7 @@ class ChatDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 class ChatP2p(APIView):
-    @staticmethod
-    def get(request, pk):
+    def get(self, request, pk):
         user_a = request.user
         user_b = get_object_or_404(User, pk=pk)
         chats = Chat.objects.filter(listUsersChat=user_a).filter(listUsersChat=user_b).distinct()
