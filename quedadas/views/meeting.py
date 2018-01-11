@@ -73,6 +73,7 @@ class TrackingView(mixins.CreateModelMixin,
 
 
 class UserMeeting(generics.ListAPIView):
+
     def get_queryset(self):
         pk = self.kwargs.get('pk', None)
         user = self.request.user
@@ -87,11 +88,11 @@ class UserMeeting(generics.ListAPIView):
         elif filt == "past":
             qs = qs.filter(date__lt=timezone.now())
         elif filt == "future":
-            qs = qs.filter(date__gte=timezone.now())
+            qs = qs.filter(date__gte=timezone.now()).exclude(tracks__in = user.tracks.all())
         return qs.order_by("date")
 
     serializer_class = MeetingSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    permission_classes = (permissions.IsAuthenticated,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('title', 'description')
     pagination_class = None
