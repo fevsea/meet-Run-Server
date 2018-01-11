@@ -1,36 +1,34 @@
-import unittest
 from collections import OrderedDict
-import unittest
+
+from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase
-from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
-from populateDB import createBasicUser
-from populateDB import createBasicUser2
-from populateDB import createBasicUserMeeting
+from rest_framework.test import APITestCase
+
+from populateDB import create_basic_user_2
+from populateDB import create_basic_user_meeting
 
 
 class ChatsTests(APITestCase):
     def setUp(self):
-        createBasicUserMeeting()
-        createBasicUser2()
+        create_basic_user_meeting()
+        create_basic_user_2()
         self.user = User.objects.get(username='awaisI')
         token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
 
     def test_create_delete_get_valid_chat_with_meeting(self):
-
         ''' COmprobamos que la lista este vacia'''
         response = self.client.get(
             reverse('chat-list')
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data['count'], 0) #comprobamos que no hay ningún chat en la base de datos
+        self.assertEqual(response.data['count'], 0)  # comprobamos que no hay ningún chat en la base de datos
 
         self.valid_payload = {
             "chatName": "Chat1",
-            "listUsersChat": [1,2],
+            "listUsersChat": [1, 2],
             "type": 1,
             "meeting": 1,
             "lastMessage": "Hola",
@@ -42,7 +40,7 @@ class ChatsTests(APITestCase):
             reverse('chat-list'),
             data=self.valid_payload
         )
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED) #comprobamos la respuesta de que se ha creado
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)  # comprobamos la respuesta de que se ha creado
         resp = {
             'pk': 1,
             'chatName': 'Chat1',
@@ -68,39 +66,39 @@ class ChatsTests(APITestCase):
             ],
             'type': 1,
             'meeting': OrderedDict([  # cada usuario es un orderedDict
+                ('id', 1),
+                ('title', 'Testing Meeting'),
+                ('description', 'bla bla bla'),
+                ('public', False),
+                ('level', 1),
+                ('date', '2017-11-28T10:52:39Z'),
+                ('latitude', '41.388576'),
+                ('longitude', '2.11284'),
+                ('owner',
+                 OrderedDict([  # cada usuario es un orderedDict
                      ('id', 1),
-                     ('title', 'Testing Meeting'),
-                     ('description', 'bla bla bla'),
-                     ('public', False),
-                     ('level', 1),
-                     ('date', '2017-11-28T10:52:39Z'),
-                     ('latitude', '41.388576'),
-                     ('longitude', '2.11284'),
-                     ('owner',
-                        OrderedDict([  # cada usuario es un orderedDict
-                            ('id', 1),
-                            ('username', 'awaisI'),
-                            ('first_name', 'Awais'),
-                            ('last_name', 'Iqbal'),
-                            ('postal_code', '08019'),
-                            ('question', 'hola?'),
-                            ('level', 1)
-                        ])
-                     ),
-                     ('chat', 1)
-                 ]),
+                     ('username', 'awaisI'),
+                     ('first_name', 'Awais'),
+                     ('last_name', 'Iqbal'),
+                     ('postal_code', '08019'),
+                     ('question', 'hola?'),
+                     ('level', 1)
+                 ])
+                 ),
+                ('chat', 1)
+            ]),
             'lastMessage': 'Hola',
             'lastMessageUserName': 0,
             'lastDateTime': '2017-11-28T10:52:39Z'
         }
-        self.assertEqual(response.data, resp) #comrpobamos el formato retornado en Json
+        self.assertEqual(response.data, resp)  # comrpobamos el formato retornado en Json
 
         ''' Miramos que se pueda acceder al chat'''
-        response = self.client.get (
+        response = self.client.get(
             reverse('chat-detail', kwargs={'pk': 1})
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(response.data, resp) #comprobamos que la respuesta sea correcta
+        self.assertEqual(response.data, resp)  # comprobamos que la respuesta sea correcta
 
         ''' Miramos la lista con 1 chat'''
         response = self.client.get(
@@ -110,10 +108,10 @@ class ChatsTests(APITestCase):
         self.assertEqual(response.data['count'], 1)  # comprobamos que no hay ningún chat en la base de datos
 
         resp = OrderedDict([
-            ('count',1),
-            ('next',None),
+            ('count', 1),
+            ('next', None),
             ('previous', None),
-            ('results',[
+            ('results', [
                 OrderedDict([
                     ('pk', 1),
                     ('chatName', 'Chat1'),
@@ -138,43 +136,44 @@ class ChatsTests(APITestCase):
                         ])
                     ]),
                     ('type', 1),
-                    ( 'meeting',
-                        OrderedDict([  # cada usuario es un orderedDict
-                            ('id', 1),
-                            ('title', 'Testing Meeting'),
-                            ('description', 'bla bla bla'),
-                            ('public', False),
-                            ('level', 1),
-                            ('date', '2017-11-28T10:52:39Z'),
-                            ('latitude', '41.388576'),
-                            ('longitude', '2.11284'),
-                            ('owner',
-                                OrderedDict([  # cada usuario es un orderedDict
-                                    ('id', 1),
-                                    ('username', 'awaisI'),
-                                    ('first_name', 'Awais'),
-                                    ('last_name', 'Iqbal'),
-                                    ('postal_code', '08019'),
-                                    ('question', 'hola?'),
-                                    ('level', 1)
-                                ])
-                            ),
-                            ('chat', 1)
-                        ])
-                    ),
+                    ('meeting',
+                     OrderedDict([  # cada usuario es un orderedDict
+                         ('id', 1),
+                         ('title', 'Testing Meeting'),
+                         ('description', 'bla bla bla'),
+                         ('public', False),
+                         ('level', 1),
+                         ('date', '2017-11-28T10:52:39Z'),
+                         ('latitude', '41.388576'),
+                         ('longitude', '2.11284'),
+                         ('owner',
+                          OrderedDict([  # cada usuario es un orderedDict
+                              ('id', 1),
+                              ('username', 'awaisI'),
+                              ('first_name', 'Awais'),
+                              ('last_name', 'Iqbal'),
+                              ('postal_code', '08019'),
+                              ('question', 'hola?'),
+                              ('level', 1)
+                          ])
+                          ),
+                         ('chat', 1)
+                     ])
+                     ),
                     ('lastMessage', 'Hola'),
                     ('lastMessageUserName', 0),
                     ('lastDateTime', '2017-11-28T10:52:39Z')
 
                 ])]
-            )
-        ]) #respuesta esperada solicitando la lista
-        self.assertEqual(response.data,resp) #comprobamos los campos que se devuelven
+             )
+        ])  # respuesta esperada solicitando la lista
+        self.assertEqual(response.data, resp)  # comprobamos los campos que se devuelven
         ''' Borramos el chat'''
         response = self.client.delete(
             reverse('chat-detail', kwargs={'pk': 1})
         )
-        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)  # comprobamos la respuesta de que se ha creado
+        self.assertEqual(response.status_code,
+                         status.HTTP_204_NO_CONTENT)  # comprobamos la respuesta de que se ha creado
 
         ''' No se encuentra el chat'''
         response = self.client.get(
@@ -579,7 +578,8 @@ class ChatsTests(APITestCase):
             reverse('chat-detail', kwargs={'pk': 1}),
             data=self.valid_payload
         )
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)  # comprobamos la respuesta de que se ha creado
+        self.assertEqual(response.status_code,
+                         status.HTTP_400_BAD_REQUEST)  # comprobamos la respuesta de que se ha creado
 
     def test_update_chat_last_message_userID_date(self):
         self.valid_payload = {
@@ -760,7 +760,8 @@ class ChatsTests(APITestCase):
             reverse('chat-detail', kwargs={'pk': 1}),
             data=self.valid_payload
         )
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)  # comprobamos la respuesta de que se ha creado
+        self.assertEqual(response.status_code,
+                         status.HTTP_400_BAD_REQUEST)  # comprobamos la respuesta de que se ha creado
 
     def test_update_chat(self):
         self.valid_payload = {
@@ -852,7 +853,7 @@ class ChatsTests(APITestCase):
             reverse('chat-detail', kwargs={'pk': 1})
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        #resp[''] = ""
+        # resp[''] = ""
         self.assertEqual(response.data, resp)  # comprobamos que la respuesta sea correcta
 
     def test_update_chat(self):
@@ -945,7 +946,5 @@ class ChatsTests(APITestCase):
             reverse('chat-detail', kwargs={'pk': 1})
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        #resp[''] = ""
+        # resp[''] = ""
         self.assertEqual(response.data, resp)  # comprobamos que la respuesta sea correcta
-
-

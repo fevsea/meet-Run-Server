@@ -1,13 +1,11 @@
-from collections import OrderedDict
-import unittest
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 
-from populateDB import createBasicUser
-from populateDB import createBasicUser2
+from populateDB import create_basic_user
+from populateDB import create_basic_user_2
 
 
 class FriendsTests(APITestCase):
@@ -19,12 +17,12 @@ class FriendsTests(APITestCase):
         token.save()'''
 
     def test_create_challenge(self):
-        createBasicUser()
+        create_basic_user()
         self.user = User.objects.get(username='awaisI')
         token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
         token.save()
-        createBasicUser2()
+        create_basic_user_2()
 
         self.valid_payload = {
             "creator": 1,
@@ -41,10 +39,10 @@ class FriendsTests(APITestCase):
 
         createdChallengeID = response.data['id']
         response2 = self.client.get(
-            reverse('challenge-detail', kwargs={'pk': createdChallengeID} )
+            reverse('challenge-detail', kwargs={'pk': createdChallengeID})
         )
-        self.assertEqual(response2.status_code, status.HTTP_200_OK) #miramos que existe la solicitud
-        self.assertIsNotNone(response2.data['id'])   #comprobar que  hay contenido en el Challenge
+        self.assertEqual(response2.status_code, status.HTTP_200_OK)  # miramos que existe la solicitud
+        self.assertIsNotNone(response2.data['id'])  # comprobar que  hay contenido en el Challenge
         self.assertEqual(response2.data['accepted'], False)
 
         '''Cambiamos de usuario'''
@@ -62,15 +60,15 @@ class FriendsTests(APITestCase):
             reverse('challenge-detail', kwargs={'pk': createdChallengeID})
         )
         self.assertEqual(response2.status_code, status.HTTP_200_OK)  # miramos que existe la solicitud
-        self.assertEqual(response2.data['id'],createdChallengeID)  # comprobar que  hay contenido en el Challenge
-        self.assertEqual(response2.data['accepted'],True)
-        #TODO hace falta comprobar todo el contenido ?
+        self.assertEqual(response2.data['id'], createdChallengeID)  # comprobar que  hay contenido en el Challenge
+        self.assertEqual(response2.data['accepted'], True)
+        # TODO hace falta comprobar todo el contenido ?
 
 
         response2 = self.client.get(
             reverse('challenge-list')
         )
-        self.assertEqual(response2.data[0]['id'],1)
+        self.assertEqual(response2.data[0]['id'], 1)
         resp = {
             'id': 1,
             "username": "awaisI",
@@ -93,16 +91,15 @@ class FriendsTests(APITestCase):
         self.assertEqual(response2.data[0]['challenged'], resp)
         self.assertEqual(response2.data[0]['distance'], 3)
         self.assertEqual(response2.data[0]['deadline'], "2018-11-28T10:52:00Z")
-        self.assertEqual(response2.data[0]['creatorDistance'], 0.0)
-        self.assertEqual(response2.data[0]['challengedDistance'], 0.0)
+        self.assertEqual(response2.data[0]['creator_distance'], 0.0)
+        self.assertEqual(response2.data[0]['challenged_distance'], 0.0)
         self.assertEqual(response2.data[0]['accepted'], True)
         self.assertEqual(response2.data[0]['completed'], False)
-
 
         response = self.client.delete(  # eliminar amistad
             reverse('challenge-detail', kwargs={'pk': createdChallengeID})
         )
-        self.assertEqual(response.status_code,status.HTTP_204_NO_CONTENT) # comprobar que se ha borrado
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)  # comprobar que se ha borrado
 
         response2 = self.client.get(
             reverse('challenge-detail', kwargs={'pk': createdChallengeID})
@@ -116,7 +113,7 @@ class FriendsTests(APITestCase):
         self.assertEqual(response2.status_code, status.HTTP_404_NOT_FOUND)  # miramos que existe la solicitud
 
     def test_userB_no_exists(self):
-        createBasicUser()
+        create_basic_user()
         self.user = User.objects.get(username='awaisI')
         token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)

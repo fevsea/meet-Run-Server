@@ -1,13 +1,11 @@
-from collections import OrderedDict
-import unittest
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 
-from populateDB import createBasicUser
-from populateDB import createBasicUser2
+from populateDB import create_basic_user
+from populateDB import create_basic_user_2
 
 
 class FriendsTests(APITestCase):
@@ -19,30 +17,30 @@ class FriendsTests(APITestCase):
         token.save()'''
 
     def test_add_friend(self):
-        createBasicUser()
+        create_basic_user()
         self.user = User.objects.get(username='awaisI')
         token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
         token.save()
-        createBasicUser2()
+        create_basic_user_2()
         response = self.client.post(
             reverse('friends', kwargs={'pk': 2}),
             format='json'
         )
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED) #comprobar que se ha creado la solicitud
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)  # comprobar que se ha creado la solicitud
 
         response2 = self.client.get(
             reverse('friends', kwargs={'pk': 2}),
             data={'accepted': False}
         )
-        self.assertEqual(response2.data['count'], 1) #comprobar que se ha creado la solicitud y no esta aceptada
+        self.assertEqual(response2.data['count'], 1)  # comprobar que se ha creado la solicitud y no esta aceptada
 
         self.user = User.objects.get(username='ericR')
         token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
         token.save()
 
-        response = self.client.post(        #aceptar la solicitud
+        response = self.client.post(  # aceptar la solicitud
             reverse('friends', kwargs={'pk': 1}),
             format='json'
         )
@@ -78,9 +76,8 @@ class FriendsTests(APITestCase):
         )
         self.assertEqual(response2.data['count'], 0)  # comprobar que ya no hay solicitudes pendientes
 
-
     def test_add_friend_no_exists(self):
-        createBasicUser()
+        create_basic_user()
         self.user = User.objects.get(username='awaisI')
         token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)

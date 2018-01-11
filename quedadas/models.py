@@ -109,11 +109,11 @@ class Statistics(models.Model):
             return self.prof.user.username
         return "Statistic object with no username"
 
-@receiver(post_save, sender=Tracking, dispatch_uid="update_statistics")
-def update_stats(sender, instance, **kwargs):
-    meetingCtrl.update_stats(sender, instance, **kwargs)
-    rankingsCtrl.update_zone_ranking(sender, instance, **kwargs)
 
+@receiver(post_save, sender=Tracking, dispatch_uid="update_statistics")
+def update_stats(_, instance):
+    meetingCtrl.update_stats(instance)
+    rankingsCtrl.update_zone_ranking(instance)
 
 
 class Profile(models.Model):
@@ -129,14 +129,16 @@ class Profile(models.Model):
 
     def get_friends(self):
         user = self.user
-        friends = User.objects.filter(Q(friend_set__creator=user) | Q(friendship_creator_set__friend=user)).filter(friend_set__accepted=True)
+        friends = User.objects.filter(Q(friend_set__creator=user) | Q(friendship_creator_set__friend=user)).filter(
+            friend_set__accepted=True)
         return friends.distinct()
 
     def save(self, *args, **kwargs):
-        old = Profile.objects.get(pk=self.pk).level
-        new = self.level
-        if old != new:
-            trophyCtrl.check_level(self.statistics, old, new)
+        if self.pk:
+            old = Profile.objects.get(pk=self.pk)
+            new = self.level
+            if old != new:
+                trophyCtrl.check_level(self.statistics, old, new)
         super(Profile, self).save(*args, **kwargs)
 
     @property
@@ -147,9 +149,8 @@ class Profile(models.Model):
         return friends.count()
 
 
-
 @receiver(post_save, sender=Profile, dispatch_uid="update_stock_count")
-def init_statistics(sender, instance, **kwargs):
+def init_statistics(_, instance):
     if instance.statistics is None:
         statistic = Statistics()
         statistic.save()
@@ -169,11 +170,11 @@ class Challenge(models.Model):
     completed = models.BooleanField(default=False, blank=True)
 
     @property
-    def creatorDistance(self):
+    def creator_distance(self):
         return self.creator.prof.statistics.distance - self.creatorBase
 
     @property
-    def challengedDistance(self):
+    def challenged_distance(self):
         return self.challenged.prof.statistics.distance - self.challengedBase
 
     def save(self, *args, **kwargs):
@@ -188,14 +189,14 @@ class Challenge(models.Model):
         if self.deadline < timezone.now():
             firebaseCtrl.challenge_finalized(self)
             self.completed = True
-        elif self.challengedDistance >= self.distance:
+        elif self.challenged_distance >= self.distance:
             firebaseCtrl.challenge_won(self, self.challenged)
             firebaseCtrl.challenge_lost(self, self.creator)
             stats = self.challenged.prof.statistics
             trophyCtrl.check_challenges(stats, stats.challenges, stats.challenges + 1)
             self.challenged.prof.statistics.challenges += 1
             self.completed = True
-        elif self.creatorDistance >= self.distance:
+        elif self.creator_distance >= self.distance:
             firebaseCtrl.challenge_lost(self, self.challenged)
             firebaseCtrl.challenge_won(self, self.creator)
             stats = self.creator.prof.statistics
@@ -212,7 +213,7 @@ class Challenge(models.Model):
 
 
 @receiver(post_save, sender=Tracking, dispatch_uid="update_challenge_statistics")
-def update_challenge_statistics(sender, instance, **kwargs):
+def update_challenge_statistics(_, instance):
     user = instance.user
     challenges_creator = user.challenge_creator.filter(completed=False)
     challenges_challenged = user.challenged.filter(completed=False)
@@ -221,13 +222,14 @@ def update_challenge_statistics(sender, instance, **kwargs):
 
 
 @receiver(post_save, sender=Challenge, dispatch_uid="notify_new_challenge")
-def notify_user(sender, instance, **kwargs):
+def notify_user(_, instance):
     firebaseCtrl.new_challenge(instance)
 
+
 class Feed(object):
-    def __init__(self, meeting, type, date, friend=None, tracking=None):
+    def __init__(self, meeting, type_f, date, friend=None, tracking=None):
         self.meeting = meeting
-        self.type = type
+        self.type = type_f
         self.friend = friend
         self.tracking = tracking
         self.date = date

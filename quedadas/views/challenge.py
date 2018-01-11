@@ -24,7 +24,8 @@ class ChallengeDetail(generics.RetrieveUpdateDestroyAPIView, APIView):
     serializer_class = ChallengeSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
-    def post(self, request, pk):
+    @staticmethod
+    def post(request, pk):
         challenge = get_object_or_404(Challenge, pk=pk)
         if challenge.challenged == request.user:
             challenge.accepted = True

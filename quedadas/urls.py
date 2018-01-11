@@ -25,7 +25,7 @@ urlpatterns = [
     url(r'^users/login$', user.login, name='user-login'),
     url(r'^users/logout$', user.logout),
     url(r'^users/token', user.TokenV.as_view(), name='token'),
-    url(r'^users/changePassword$', user.changePassword.as_view(), name='change-password'),
+    url(r'^users/changePassword$', user.ChangePassword.as_view(), name='change-password'),
     url(r'^users/friends$', user.Friends.as_view()),
     url(r'^users/friends/(?P<pk>[0-9]+)$', user.Friends.as_view(), name='friends'),
     url(r'^users/(?P<pk>[0-9]+)/friends$', user.Friends.as_view(), name='friends-pk'),
@@ -49,14 +49,13 @@ urlpatterns = [
     url(r'^rankings/zone/(?P<pk>[0-9]+)$', rankings.ZoneDetail.as_view(), name='zone-detail'),
     url(r'^rankings/zip$', rankings.ZipList.as_view(), name='zip-list'),
 
-    #Tophies
+    # Tophies
     url(r'^trophies$', trophies.Stats.as_view(), name="trophies"),
     url(r'^trophies/(?P<pk>[0-9]+)$', trophies.Stats.as_view(), name="trophies-pk"),
 
-    #Feed
+    # Feed
     url(r'^feed/(?P<pk>[0-9]+)$', user.Feed.as_view(), name="feed-pk"),
     url(r'^feed$', user.Feed.as_view(), name="feed"),
-
 
 ]
 
