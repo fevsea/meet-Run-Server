@@ -11,11 +11,7 @@ from populateDB import create_basic_user
 
 class UsersTests(APITestCase):
     def setUp(self):
-        '''populate()
-        self.user = User.objects.get(username='awaisI')
-        token = Token.objects.create(user=self.user)
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
-        token.save()'''
+        pass
 
     def test_register_user_valid(self):
         self.valid_payload = {
@@ -35,17 +31,6 @@ class UsersTests(APITestCase):
             format='json'
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        resp = {
-            'id': 1,
-            "username": "awaisI",
-            "first_name": "Awais",
-            "last_name": "Iqbal",
-            "password": "pbkdf2_sha256$30000$zOhtdyJpxhqR$QGJSYx/Vk+0qQm7CrFDt/1T2UoZpvY/aA2d4h5oIF7s=",
-            "postal_code": "08019",
-            "question": "hola?",
-            "answer": "hola",
-            "level": 2
-        }
         self.assertEqual(response.data['id'], 1)
         self.assertEqual(response.data['username'], 'awaisI')
         self.assertEqual(response.data['first_name'], 'Awais')

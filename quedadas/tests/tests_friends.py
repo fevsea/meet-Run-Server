@@ -10,11 +10,7 @@ from populateDB import create_basic_user_2
 
 class FriendsTests(APITestCase):
     def setUp(self):
-        '''populate()
-        self.user = User.objects.get(username='awaisI')
-        token = Token.objects.create(user=self.user)
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
-        token.save()'''
+        pass
 
     def test_add_friend(self):
         create_basic_user()

@@ -13,11 +13,7 @@ from populateDB import create_basic_user_meeting
 
 class MeetingsTests(APITestCase):
     def setUp(self):
-        '''populate()
-        self.user = User.objects.get(username='awaisI')
-        token = Token.objects.create(user=self.user)
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
-        token.save()'''
+        pass
 
     def test_create_valid_meeting(self):
         self.valid_payload = {

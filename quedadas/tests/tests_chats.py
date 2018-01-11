@@ -19,7 +19,7 @@ class ChatsTests(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
 
     def test_create_delete_get_valid_chat_with_meeting(self):
-        ''' COmprobamos que la lista este vacia'''
+        # Comprobamos que la lista este vacia
         response = self.client.get(
             reverse('chat-list')
         )
@@ -264,7 +264,7 @@ class ChatsTests(APITestCase):
         self.assertEqual(response.data, resp)  # comprobamos que la respuesta sea correcta
 
     def test_p2p_not_found(self):
-        ''' Comprobamos que la llamada devuelve el chat '''
+        # Comprobamos que la llamada devuelve el chat
         response = self.client.get(
             reverse('chat-p2p', kwargs={'pk': 1})
         )
@@ -762,99 +762,6 @@ class ChatsTests(APITestCase):
         )
         self.assertEqual(response.status_code,
                          status.HTTP_400_BAD_REQUEST)  # comprobamos la respuesta de que se ha creado
-
-    def test_update_chat(self):
-        self.valid_payload = {
-            "chatName": "Chat1",
-            "listUsersChat": [1, 2],
-            "type": 1,
-            "meeting": 1,
-            "lastMessage": "Hola",
-            "lastMessageUserName": 0,
-            "lastDateTime": "2017-11-28T10:52:39"
-        }
-        ''' Creamos un chat'''
-        response = self.client.post(
-            reverse('chat-list'),
-            data=self.valid_payload
-        )
-        self.assertEqual(response.status_code,
-                         status.HTTP_201_CREATED)  # comprobamos la respuesta de que se ha creado
-        resp = {
-            'pk': 1,
-            'chatName': 'Chat1',
-            'listUsersChat': [
-                OrderedDict([  # cada usuario es un orderedDict
-                    ('id', 1),
-                    ('username', 'awaisI'),
-                    ('first_name', 'Awais'),
-                    ('last_name', 'Iqbal'),
-                    ('postal_code', '08019'),
-                    ('question', 'hola?'),
-                    ('level', 1),
-                ]),
-                OrderedDict([
-                    ('id', 2),
-                    ('username', 'ericR'),
-                    ('first_name', 'Eric'),
-                    ('last_name', 'Rodríguez'),
-                    ('postal_code', '08019'),
-                    ('question', 'hola?'),
-                    ('level', 1)
-                ])
-            ],
-            'type': 1,
-            'meeting': OrderedDict([  # cada usuario es un orderedDict
-                ('id', 1),
-                ('title', 'Testing Meeting'),
-                ('description', 'bla bla bla'),
-                ('public', False),
-                ('level', 1),
-                ('date', '2017-11-28T10:52:39Z'),
-                ('latitude', '41.388576'),
-                ('longitude', '2.11284'),
-                ('owner',
-                 OrderedDict([  # cada usuario es un orderedDict
-                     ('id', 1),
-                     ('username', 'awaisI'),
-                     ('first_name', 'Awais'),
-                     ('last_name', 'Iqbal'),
-                     ('postal_code', '08019'),
-                     ('question', 'hola?'),
-                     ('level', 1)
-                 ])
-                 ),
-                ('chat', 1)
-            ]),
-            'lastMessage': 'Hola',
-            'lastMessageUserName': 0,
-            'lastDateTime': '2017-11-28T10:52:39Z'
-        }
-        self.assertEqual(response.data, resp)  # comrpobamos el formato retornado en Json
-
-        ''' Hacemos el update'''
-
-        self.valid_payload = {
-            "chatName": "Chat1",
-            "listUsersChat": [1, 2],
-            "type": 1,
-            "meeting": 1,
-            "lastMessage": "Hola",
-            "lastMessageUserName": 0,
-            "lastDateTime": "2017-11-28T10:52:39"
-        }
-        response = self.client.put(
-            reverse('chat-detail', kwargs={'pk': 1}),
-            data=self.valid_payload
-        )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)  # comprobamos la respuesta de que se ha creado
-
-        response = self.client.get(
-            reverse('chat-detail', kwargs={'pk': 1})
-        )
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        # resp[''] = ""
-        self.assertEqual(response.data, resp)  # comprobamos que la respuesta sea correcta
 
     def test_update_chat(self):
         self.valid_payload = {

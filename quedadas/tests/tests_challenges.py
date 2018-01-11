@@ -10,11 +10,7 @@ from populateDB import create_basic_user_2
 
 class FriendsTests(APITestCase):
     def setUp(self):
-        '''populate()
-        self.user = User.objects.get(username='awaisI')
-        token = Token.objects.create(user=self.user)
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
-        token.save()'''
+        pass
 
     def test_create_challenge(self):
         create_basic_user()
@@ -37,9 +33,9 @@ class FriendsTests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)  # comprobar que se ha creado la solicitud
 
-        createdChallengeID = response.data['id']
+        created_challenge_id = response.data['id']
         response2 = self.client.get(
-            reverse('challenge-detail', kwargs={'pk': createdChallengeID})
+            reverse('challenge-detail', kwargs={'pk': created_challenge_id})
         )
         self.assertEqual(response2.status_code, status.HTTP_200_OK)  # miramos que existe la solicitud
         self.assertIsNotNone(response2.data['id'])  # comprobar que  hay contenido en el Challenge
@@ -52,18 +48,16 @@ class FriendsTests(APITestCase):
         token.save()
 
         response = self.client.post(  # aceptar la solicitud
-            reverse('challenge-detail', kwargs={'pk': createdChallengeID})
+            reverse('challenge-detail', kwargs={'pk': created_challenge_id})
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)  # comprobar que se ha creado la solicitud
 
         response2 = self.client.get(
-            reverse('challenge-detail', kwargs={'pk': createdChallengeID})
+            reverse('challenge-detail', kwargs={'pk': created_challenge_id})
         )
         self.assertEqual(response2.status_code, status.HTTP_200_OK)  # miramos que existe la solicitud
-        self.assertEqual(response2.data['id'], createdChallengeID)  # comprobar que  hay contenido en el Challenge
+        self.assertEqual(response2.data['id'], created_challenge_id)  # comprobar que  hay contenido en el Challenge
         self.assertEqual(response2.data['accepted'], True)
-        # TODO hace falta comprobar todo el contenido ?
-
 
         response2 = self.client.get(
             reverse('challenge-list')
@@ -97,12 +91,12 @@ class FriendsTests(APITestCase):
         self.assertEqual(response2.data[0]['completed'], False)
 
         response = self.client.delete(  # eliminar amistad
-            reverse('challenge-detail', kwargs={'pk': createdChallengeID})
+            reverse('challenge-detail', kwargs={'pk': created_challenge_id})
         )
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)  # comprobar que se ha borrado
 
         response2 = self.client.get(
-            reverse('challenge-detail', kwargs={'pk': createdChallengeID})
+            reverse('challenge-detail', kwargs={'pk': created_challenge_id})
         )
         self.assertEqual(response2.status_code, status.HTTP_404_NOT_FOUND)  # miramos que existe la solicitud
 
