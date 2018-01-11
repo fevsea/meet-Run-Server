@@ -4,6 +4,8 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from quedadas.controllers import challengeCtrl
+from quedadas.controllers.challengeCtrl import accept_challenge
 from quedadas.models import Challenge
 from quedadas.serializers import ChallengeSerializer
 
@@ -15,8 +17,7 @@ class ChallengeList(generics.ListCreateAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        qs = Challenge.objects.filter(completed=False).filter(Q(creator=user) | Q(challenged=user)).distinct()
-        return qs
+        return challengeCtrl.get_list(user)
 
 
 class ChallengeDetail(generics.RetrieveUpdateDestroyAPIView, APIView):
@@ -24,11 +25,9 @@ class ChallengeDetail(generics.RetrieveUpdateDestroyAPIView, APIView):
     serializer_class = ChallengeSerializer
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
-    def post(self, request, pk):
+    @staticmethod
+    def post(request, pk):
         challenge = get_object_or_404(Challenge, pk=pk)
-        if challenge.challenged == request.user:
-            challenge.accepted = True
-            challenge.save()
-            challenge.notify_accepted()
+        if accept_challenge(challenge, request.user):
             return Response(200)
         return Response(403)

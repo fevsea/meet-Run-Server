@@ -10,16 +10,15 @@ from rest_framework.generics import get_object_or_404
 from rest_framework.parsers import JSONParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.settings import api_settings
 from rest_framework.status import HTTP_401_UNAUTHORIZED, HTTP_403_FORBIDDEN, HTTP_200_OK, HTTP_400_BAD_REQUEST, \
     HTTP_202_ACCEPTED, HTTP_201_CREATED, HTTP_204_NO_CONTENT
 from rest_framework.views import APIView
-from rest_framework.settings import api_settings
 
-from quedadas import firebase
+from quedadas.controllers import firebaseCtrl, trophyCtrl, userCtrl
 from quedadas.models import Friendship
-from quedadas.permissions import IsOwnerOrReadOnly
-from quedadas.serializers import UserSerializer, UserSerializerDetail, ChangePassword, StatsSerializer, TokenSerializer, \
-    FriendSerializer
+from quedadas.serializers import UserSerializer, UserSerializerDetail, ChangePasswordSerializer, StatsSerializer, \
+    TokenSerializer, FriendSerializer, FeedSerializer
 
 
 class UserList(generics.ListCreateAPIView):
@@ -39,13 +38,14 @@ class UserList(generics.ListCreateAPIView):
 class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializerDetail
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
 
 class CurrentUserView(APIView):
     permission_classes = (permissions.IsAuthenticated,)
 
-    def get(self, request, format=None):
+    @staticmethod
+    def get(request):
         serializer = UserSerializerDetail(request.user)
         return Response(serializer.data)
 
@@ -63,11 +63,11 @@ def login(request):
     return Response({"token": token.key})
 
 
-class changePassword(APIView):
+class ChangePassword(APIView):
     permission_classes = (IsAuthenticated,)
 
-    def post(self, request, format=None):
-        serializer = ChangePassword(data=request.data)
+    def post(self, request):
+        serializer = ChangePasswordSerializer(data=request.data)
         if serializer.is_valid():
             user = self.request.user
             if not user.check_password(serializer["old"].value):
@@ -90,20 +90,24 @@ def logout(request):
 
 
 class Friends(APIView):
-    permission_classes = ((IsAuthenticated,))
+    permission_classes = (IsAuthenticated,)
     pagination_class = api_settings.DEFAULT_PAGINATION_CLASS
     filter_backends = (DjangoFilterBackend,)
     filter_fields = ('accepted',)
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._paginator = self.pagination_class()
 
     def get(self, request, pk=None):
         user = request.user
         if pk is not None:
             user = get_object_or_404(User, pk=pk)
-        friends_qs = Friendship.objects.filter(Q(creator=user)| Q(friend=user))
+        friends_qs = Friendship.objects.filter(Q(creator=user) | Q(friend=user))
         accepted = request.query_params.get("accepted")
         if accepted is not None:
             accepted = accepted in ['true', 'True', '1', 't', 'y', 'yes', 'yeah', 'yup', 'certainly', 'uh-huh']
-            friends_qs=  friends_qs.filter(accepted=accepted)
+            friends_qs = friends_qs.filter(accepted=accepted)
         page = self.paginate_queryset(friends_qs)
         if page is not None:
             serializer = FriendSerializer(page, many=True)
@@ -112,39 +116,41 @@ class Friends(APIView):
         serializer = UserSerializerDetail(friends_qs, many=True)
         return Response(serializer.data)
 
-    def post(self, request, pk=None, format=None):
+    @staticmethod
+    def post(request, pk=None):
         user = request.user
         friend = get_object_or_404(User, pk=pk)
-        status_code = HTTP_202_ACCEPTED
-        firends_qs = user.prof.get_friends().filter(pk=pk)
+
         friendship = Friendship.objects.filter(Q(creator=user, friend=friend) | Q(friend=user, creator=friend))
         if pk == user.pk:
             status_code = HTTP_204_NO_CONTENT
         elif not friendship.exists():
-            friendshipI = Friendship(creator=user, friend=friend)
-            friendshipI.save()
-            firebase.new_friend(friendshipI)
+            friendship_i = Friendship(creator=user, friend=friend)
+            friendship_i.save()
+            firebaseCtrl.new_friend(friendship_i)
             status_code = HTTP_201_CREATED
         else:
-            friendshipI = friendship[0]
-            if friendshipI.creator.pk == user.pk:
+            friendship_i = friendship[0]
+            if friendship_i.creator.pk == user.pk:
                 status_code = HTTP_204_NO_CONTENT
             else:
-                friendshipI.accepted = True
-                friendshipI.save()
-                firebase.friend_accepted(friendshipI)
+                friendship_i.accepted = True
+                friendship_i.save()
+                firebaseCtrl.friend_accepted(friendship_i)
+                trophyCtrl.check_friends(user)
                 status_code = HTTP_201_CREATED
 
         firends_qs = Friendship.objects.filter(Q(creator=user, friend=friend) | Q(friend=user, creator=friend))
         serializer = FriendSerializer(firends_qs, many=True)
         return Response(serializer.data, status_code)
 
-    def delete(self, request, pk=None, format=None):
+    @staticmethod
+    def delete(request, pk=None):
         user = request.user
         friend = get_object_or_404(User, pk=pk)
         status_code = HTTP_204_NO_CONTENT
         firends_qs = user.prof.get_friends().filter(pk=pk)
-        if (firends_qs.exists() and pk != user.pk):
+        if firends_qs.exists() and pk != user.pk:
             Friendship.objects.filter(Q(creator=user, friend=friend) | Q(friend=user, creator=friend)).delete()
             status_code = HTTP_200_OK
         firends_qs = user.prof.get_friends()
@@ -160,7 +166,7 @@ class Friends(APIView):
             if self.pagination_class is None:
                 self._paginator = None
             else:
-                self._paginator = self.pagination_class()
+                pass
         return self._paginator
 
     def paginate_queryset(self, queryset):
@@ -178,9 +184,12 @@ class Friends(APIView):
         assert self.paginator is not None
         return self.paginator.get_paginated_response(data)
 
+
 class Stats(APIView):
-    permission_classes = ((IsAuthenticated,))
-    def get(self, request, pk=None):
+    permission_classes = (IsAuthenticated,)
+
+    @staticmethod
+    def get(request, pk=None):
         user = request.user
         if pk is not None:
             user = get_object_or_404(User, pk=pk)
@@ -189,13 +198,16 @@ class Stats(APIView):
 
 
 class TokenV(APIView):
-    permission_classes = ((IsAuthenticated,))
-    def get(self, request):
+    permission_classes = (IsAuthenticated,)
+
+    @staticmethod
+    def get(request):
         user = request.user
         serializer = TokenSerializer({"token": user.prof.token}, many=False)
         return Response(serializer.data)
 
-    def post(self, request):
+    @staticmethod
+    def post(request):
         user = request.user
         data = JSONParser().parse(request)
         serializer = TokenSerializer(data=data)
@@ -207,9 +219,38 @@ class TokenV(APIView):
             return JsonResponse(serializer.data)
         return JsonResponse(serializer.errors, status=400)
 
-    def delete(self, request):
+    @staticmethod
+    def delete(request):
         user = request.user
         user.prof.token = None
         user.prof.save()
         return Response(status=200)
 
+
+class Ban(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    @staticmethod
+    def post(request, pk=None):
+        status = 200
+        if pk is None:
+            pk = request.user.pk
+        user = get_object_or_404(User, pk=pk)
+        if request.user in user.prof.ban_count.all():
+            status = 403
+        else:
+            userCtrl.ban_request(request.user, user)
+        return Response(status=status)
+
+
+class Feed(generics.ListAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = FeedSerializer
+    pagination_class = None
+
+    def get_queryset(self):
+        pk = self.kwargs.get('pk', None)
+        if pk is None:
+            pk = self.request.user.pk
+        user = get_object_or_404(User, pk=pk)
+        return userCtrl.get_feed(user)

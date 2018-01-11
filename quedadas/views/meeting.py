@@ -1,27 +1,26 @@
-from datetime import date, datetime
+import operator
 from functools import reduce
 
 from django.contrib.auth.models import User
+from django.db.models import Q
+from django.utils import timezone
 from rest_framework import generics, permissions, filters, mixins, status
 from rest_framework.generics import get_object_or_404
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.settings import api_settings
 from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_204_NO_CONTENT, HTTP_200_OK
 from rest_framework.views import APIView
-from django.db.models import Q
-import operator
-from rest_framework.settings import api_settings
-from django.utils import timezone
 
 from quedadas.models import Meeting, Tracking
-from quedadas.permissions import IsOwnerOrReadOnly
+from quedadas.permissions import IsNotBaned
 from quedadas.serializers import MeetingSerializer, TrackingSerializer, UserSerializerDetail
 
 
 class MeetingList(generics.ListCreateAPIView):
     queryset = Meeting.objects.all().order_by("date")
     serializer_class = MeetingSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsNotBaned)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('title', 'description')
 
@@ -32,14 +31,14 @@ class MeetingList(generics.ListCreateAPIView):
 class MeetingDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Meeting.objects.all()
     serializer_class = MeetingSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
 
 class TrackingView(mixins.CreateModelMixin,
                    mixins.DestroyModelMixin,
                    mixins.RetrieveModelMixin,
                    generics.GenericAPIView):
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
     serializer_class = TrackingSerializer
     queryset = Tracking.objects.all()
     lookup_fields = ('meeting', 'user')
@@ -47,10 +46,10 @@ class TrackingView(mixins.CreateModelMixin,
     def get_object(self):
         queryset = self.get_queryset()  # Get the base queryset
         queryset = self.filter_queryset(queryset)  # Apply any filter backends
-        filter = {}
+        filter_i = {}
         for field in self.lookup_fields:
-            filter[field] = self.kwargs[field]
-        q = reduce(operator.and_, (Q(x) for x in filter.items()))
+            filter_i[field] = self.kwargs[field]
+        q = reduce(operator.and_, (Q(x) for x in filter_i.items()))
         return get_object_or_404(queryset, q)
 
     def get(self, request, *args, **kwargs):
@@ -59,14 +58,14 @@ class TrackingView(mixins.CreateModelMixin,
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
 
-    def post(self, request, meeting, user, format=None):
+    def post(self, request, meeting, user):
         if Tracking.objects.filter(user=user).filter(meeting=meeting).exists():
             return Response(status=status.HTTP_409_CONFLICT)
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             serializer.validated_data.update({
                 'user': get_object_or_404(User, pk=user),
-                'meeting' : get_object_or_404(Meeting, pk=meeting)
+                'meeting': get_object_or_404(Meeting, pk=meeting)
             })
             serializer.save()
             return Response(serializer.data, status=HTTP_201_CREATED)
@@ -88,21 +87,25 @@ class UserMeeting(generics.ListAPIView):
         elif filt == "past":
             qs = qs.filter(date__lt=timezone.now())
         elif filt == "future":
-            qs = qs.filter(date__gte=timezone.now())
+            qs = qs.filter(date__gte=timezone.now()).exclude(tracks__in=user.tracks.all())
         return qs.order_by("date")
 
     serializer_class = MeetingSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    permission_classes = (permissions.IsAuthenticated,)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('title', 'description')
     pagination_class = None
 
 
 class JoinMeeting(APIView):
-    permission_classes = ((IsAuthenticated,))
+    permission_classes = (IsAuthenticated, IsNotBaned)
     pagination_class = api_settings.DEFAULT_PAGINATION_CLASS
 
-    def get(self, request, pk, usr=None):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self._paginator = self.pagination_class()
+
+    def get(self, pk):
         meeting = get_object_or_404(Meeting, pk=pk)
         attendences = meeting.participants.all()
         page = self.paginate_queryset(attendences)
@@ -113,7 +116,8 @@ class JoinMeeting(APIView):
         serializer = UserSerializerDetail(attendences, many=True)
         return Response(serializer.data)
 
-    def post(self, request, pk, usr=None):
+    @staticmethod
+    def post(request, pk, usr=None):
         user = request.user
         if usr is not None:
             user = get_object_or_404(User, pk=usr)
@@ -123,7 +127,8 @@ class JoinMeeting(APIView):
         meeting.save()
         return Response(status=status_code)
 
-    def delete(self, request, pk, usr):
+    @staticmethod
+    def delete(request, pk, usr):
         user = request.user
         if usr is not None:
             user = get_object_or_404(User, usr)
@@ -142,7 +147,7 @@ class JoinMeeting(APIView):
             if self.pagination_class is None:
                 self._paginator = None
             else:
-                self._paginator = self.pagination_class()
+                pass
         return self._paginator
 
     def paginate_queryset(self, queryset):
@@ -159,4 +164,3 @@ class JoinMeeting(APIView):
         """
         assert self.paginator is not None
         return self.paginator.get_paginated_response(data)
-

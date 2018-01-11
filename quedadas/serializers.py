@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from .models import Meeting, Profile, Tracking, RoutePoint, Chat, Statistics, Challenge, Friendship
+from .models import Meeting, Profile, Tracking, RoutePoint, Chat, Statistics, Challenge, Friendship, Zone
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -13,6 +13,9 @@ class UserSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         profile_data = validated_data.pop('prof')
         user = User.objects.create(**validated_data)
+        pc = profile_data.get("postal_code")
+        zone, _ = Zone.objects.get_or_create(pk=pc)
+        profile_data["postal_code"] = zone
         Profile.objects.create(user=user, **profile_data)
         return user
 
@@ -31,7 +34,8 @@ class UserSerializerDetail(serializers.ModelSerializer):
         profile_data = validated_data.pop('prof')
 
         instance.prof.question = profile_data.get('question', instance.prof.question)
-        instance.prof.postal_code = profile_data.get('postal_code', instance.prof.postal_code)
+        zip_i = profile_data.get('postal_code', instance.prof.postal_code.zip)
+        instance.prof.postal_code, _ = Zone.objects.get_or_create(pk=zip_i)
         instance.username = validated_data.get('username', instance.username)
         instance.last_name = validated_data.get('last_name', instance.last_name)
         instance.first_name = validated_data.get('first_name', instance.first_name)
@@ -48,8 +52,9 @@ class UserSerializerDetail(serializers.ModelSerializer):
 
 class MeetingSerializer(serializers.ModelSerializer):
     owner = UserSerializerDetail(many=False, read_only=True)
-    chat = serializers.IntegerField(source="chat_r.pk", read_only=True)
-    #participants = UserSerializerDetail(many=True, read_only=True)
+    chat = serializers.IntegerField(source="chat_r.pk", read_only=True, allow_null=True)
+
+    # participants = UserSerializerDetail(many=True, read_only=True)
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
@@ -59,12 +64,26 @@ class MeetingSerializer(serializers.ModelSerializer):
         fields = ('id', 'title', 'description', 'public', 'level', 'date', 'latitude', 'longitude', 'owner', 'chat')
 
 
-class ChangePassword(serializers.Serializer):
+class ChangePasswordSerializer(serializers.Serializer):
+    def update(self, instance, validated_data):
+        pass
+
+    def create(self, validated_data):
+        pass
+
     old = serializers.CharField(required=True)
     new = serializers.CharField(required=True)
 
+
 class TokenSerializer(serializers.Serializer):
+    def update(self, instance, validated_data):
+        pass
+
+    def create(self, validated_data):
+        pass
+
     token = serializers.CharField(required=True)
+
 
 class PointSerializer(serializers.ModelSerializer):
     class Meta:
@@ -87,23 +106,26 @@ class TrackingSerializer(serializers.ModelSerializer):
             RoutePoint.objects.create(track=tracking, **track_data)
         return tracking
 
+
 class ChatSerializer(serializers.ModelSerializer):
     listUsersChat = UserSerializerDetail(many=True, read_only=True)
     meeting = MeetingSerializer(many=False, read_only=True)
 
     class Meta:
         model = Chat
-        fields = ('pk', 'chatName', 'listUsersChat', 'type', 'meeting', 'lastMessage', 'lastMessageUserName', 'lastDateTime' )
+        fields = (
+            'pk', 'chatName', 'listUsersChat', 'type', 'meeting', 'lastMessage', 'lastMessageUserName', 'lastDateTime')
+
 
 class ChatSerializerCreate(serializers.ModelSerializer):
     def to_representation(self, value):
-        return  ChatSerializer().to_representation(value)
-
+        return ChatSerializer().to_representation(value)
 
     class Meta:
         model = Chat
         fields = (
-        'chatName', 'listUsersChat', 'type', 'meeting', 'lastMessage', 'lastMessageUserName', 'lastDateTime')
+            'chatName', 'listUsersChat', 'type', 'meeting', 'lastMessage', 'lastMessageUserName', 'lastDateTime')
+
 
 class TrackingSerializerNoPoints(serializers.ModelSerializer):
     class Meta:
@@ -113,12 +135,12 @@ class TrackingSerializerNoPoints(serializers.ModelSerializer):
 
 class StatsSerializer(serializers.ModelSerializer):
     lastTracking = TrackingSerializerNoPoints(many=False, read_only=True)
+
     class Meta:
         model = Statistics
         fields = (
-        'distance', 'steps', 'totalTimeMillis', 'calories', 'meetingsCompletats', 'averagespeed', 'lastTracking',
-        'maxDistance', 'maxAverageSpeed', 'maxDuration', 'minDistance', 'minAverageSpeed', 'minDuration')
-
+            'distance', 'steps', 'totalTimeMillis', 'calories', 'meetingsCompletats', 'averagespeed', 'lastTracking',
+            'maxDistance', 'maxAverageSpeed', 'maxDuration', 'minDistance', 'minAverageSpeed', 'minDuration')
 
 
 class ChallengeSerializer(serializers.ModelSerializer):
@@ -130,11 +152,56 @@ class ChallengeSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Challenge
-        fields = ('id', 'creator', 'challenged', 'distance', 'created', 'deadline', 'creatorDistance', 'challengedDistance', 'accepted', 'completed')
+        fields = (
+            'id', 'creator', 'challenged', 'distance', 'created', 'deadline', 'creator_distance', 'challenged_distance',
+            'accepted', 'completed')
+
 
 class FriendSerializer(serializers.ModelSerializer):
     creator = UserSerializerDetail(many=False, read_only=True)
-    friend  = UserSerializerDetail(many=False, read_only=True)
+    friend = UserSerializerDetail(many=False, read_only=True)
+
     class Meta:
         model = Friendship
         fields = ('created', 'creator', 'friend', 'accepted')
+
+
+class ZoneSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Zone
+        fields = ("zip", "average", "distance")
+
+
+class ZipSerializer(serializers.Serializer):
+    def update(self, instance, validated_data):
+        pass
+
+    def create(self, validated_data):
+        pass
+
+    zip = serializers.CharField(read_only=True)
+
+
+class RankingSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(source='user.username')
+    first_name = serializers.CharField(source='user.first_name')
+    last_name = serializers.CharField(source='user.last_name')
+    distance = serializers.IntegerField(source='statistics.distance')
+    id = serializers.IntegerField(source='user.pk')
+
+    class Meta:
+        model = Profile
+        fields = ("id", "username", "first_name", "last_name", "postal_code", "distance")
+
+
+class FeedSerializer(serializers.Serializer):
+    def update(self, instance, validated_data):
+        pass
+
+    def create(self, validated_data):
+        pass
+
+    meeting = MeetingSerializer(many=False, read_only=True)
+    type = serializers.IntegerField()
+    friend = UserSerializerDetail(many=False, read_only=True, allow_null=True)
+    tracking = TrackingSerializer(many=False, read_only=True, allow_null=True)
