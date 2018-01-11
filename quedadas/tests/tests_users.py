@@ -1,6 +1,4 @@
-import unittest
 from collections import OrderedDict
-import unittest
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -11,11 +9,7 @@ from populateDB import createBasicUser
 
 class UsersTests(APITestCase):
     def setUp(self):
-        '''populate()
-        self.user = User.objects.get(username='awaisI')
-        token = Token.objects.create(user=self.user)
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
-        token.save()'''
+        pass
 
     def test_register_user_valid(self):
         self.valid_payload = {
@@ -35,17 +29,6 @@ class UsersTests(APITestCase):
             format='json'
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        resp = {
-            'id': 1,
-            "username": "awaisI",
-            "first_name": "Awais",
-            "last_name": "Iqbal",
-            "password": "pbkdf2_sha256$30000$zOhtdyJpxhqR$QGJSYx/Vk+0qQm7CrFDt/1T2UoZpvY/aA2d4h5oIF7s=",
-            "postal_code": "08019",
-            "question": "hola?",
-            "answer": "hola",
-            "level": 2
-        }
         self.assertEqual(response.data['id'], 1)
         self.assertEqual(response.data['username'], 'awaisI')
         self.assertEqual(response.data['first_name'], 'Awais')
@@ -80,7 +63,7 @@ class UsersTests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         resp = {
-            "username" : ["A user with that username already exists."]
+            "username": ["A user with that username already exists."]
         }
         self.assertEqual(response.data, resp)
 
@@ -103,7 +86,7 @@ class UsersTests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         resp = {
-            "username" : ["This field may not be blank."],
+            "username": ["This field may not be blank."],
             "password": ["This field may not be blank."],
             "postal_code": ["This field may not be blank."],
             "question": ["This field may not be blank."],
@@ -139,20 +122,20 @@ class UsersTests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         resp = OrderedDict([
-            ('count',1),
+            ('count', 1),
             ('next', None),
             ('previous', None),
             ('results',
-             [  #array de usuarios
-                 OrderedDict([ #cada usuario es un orderedDict
-                 ('id', 1),
-                 ('username', 'awaisI'),
-                 ('first_name', 'Awais'),
-                 ('last_name', 'Iqbal'),
-                 ('postal_code', '08019'),
-                 ('question', 'hola?'),
-                 ('level', 1),
-                ])
+             [  # array de usuarios
+                 OrderedDict([  # cada usuario es un orderedDict
+                     ('id', 1),
+                     ('username', 'awaisI'),
+                     ('first_name', 'Awais'),
+                     ('last_name', 'Iqbal'),
+                     ('postal_code', '08019'),
+                     ('question', 'hola?'),
+                     ('level', 1),
+                 ])
              ]
              )
         ])
@@ -174,7 +157,7 @@ class UsersTests(APITestCase):
             "level": 3
         }
         response = self.client.patch(
-            reverse('user-detail', kwargs={'pk':1}),
+            reverse('user-detail', kwargs={'pk': 1}),
             data=self.valid_payload,
             format='json'
         )
@@ -198,7 +181,7 @@ class UsersTests(APITestCase):
         token.save()
 
         response = self.client.delete(
-            reverse('user-detail', kwargs={'pk':1}),
+            reverse('user-detail', kwargs={'pk': 1}),
             format='json'
         )
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
@@ -276,6 +259,6 @@ class UsersTests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         resp = {
-                'token': tok
+            'token': tok
         }
         self.assertEqual(response.data, resp)

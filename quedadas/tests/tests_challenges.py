@@ -1,5 +1,3 @@
-from collections import OrderedDict
-import unittest
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
@@ -12,11 +10,7 @@ from populateDB import createBasicUser2
 
 class FriendsTests(APITestCase):
     def setUp(self):
-        '''populate()
-        self.user = User.objects.get(username='awaisI')
-        token = Token.objects.create(user=self.user)
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
-        token.save()'''
+        pass
 
     def test_create_challenge(self):
         createBasicUser()
@@ -39,12 +33,12 @@ class FriendsTests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)  # comprobar que se ha creado la solicitud
 
-        createdChallengeID = response.data['id']
+        created_challenge_id = response.data['id']
         response2 = self.client.get(
-            reverse('challenge-detail', kwargs={'pk': createdChallengeID} )
+            reverse('challenge-detail', kwargs={'pk': created_challenge_id})
         )
-        self.assertEqual(response2.status_code, status.HTTP_200_OK) #miramos que existe la solicitud
-        self.assertIsNotNone(response2.data['id'])   #comprobar que  hay contenido en el Challenge
+        self.assertEqual(response2.status_code, status.HTTP_200_OK)  # miramos que existe la solicitud
+        self.assertIsNotNone(response2.data['id'])  # comprobar que  hay contenido en el Challenge
         self.assertEqual(response2.data['accepted'], False)
 
         '''Cambiamos de usuario'''
@@ -54,23 +48,21 @@ class FriendsTests(APITestCase):
         token.save()
 
         response = self.client.post(  # aceptar la solicitud
-            reverse('challenge-detail', kwargs={'pk': createdChallengeID})
+            reverse('challenge-detail', kwargs={'pk': created_challenge_id})
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)  # comprobar que se ha creado la solicitud
 
         response2 = self.client.get(
-            reverse('challenge-detail', kwargs={'pk': createdChallengeID})
+            reverse('challenge-detail', kwargs={'pk': created_challenge_id})
         )
         self.assertEqual(response2.status_code, status.HTTP_200_OK)  # miramos que existe la solicitud
-        self.assertEqual(response2.data['id'],createdChallengeID)  # comprobar que  hay contenido en el Challenge
-        self.assertEqual(response2.data['accepted'],True)
-        #TODO hace falta comprobar todo el contenido ?
-
+        self.assertEqual(response2.data['id'], created_challenge_id)  # comprobar que  hay contenido en el Challenge
+        self.assertEqual(response2.data['accepted'], True)
 
         response2 = self.client.get(
             reverse('challenge-list')
         )
-        self.assertEqual(response2.data[0]['id'],1)
+        self.assertEqual(response2.data[0]['id'], 1)
         resp = {
             'id': 1,
             "username": "awaisI",
@@ -98,14 +90,13 @@ class FriendsTests(APITestCase):
         self.assertEqual(response2.data[0]['accepted'], True)
         self.assertEqual(response2.data[0]['completed'], False)
 
-
         response = self.client.delete(  # eliminar amistad
-            reverse('challenge-detail', kwargs={'pk': createdChallengeID})
+            reverse('challenge-detail', kwargs={'pk': created_challenge_id})
         )
-        self.assertEqual(response.status_code,status.HTTP_204_NO_CONTENT) # comprobar que se ha borrado
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)  # comprobar que se ha borrado
 
         response2 = self.client.get(
-            reverse('challenge-detail', kwargs={'pk': createdChallengeID})
+            reverse('challenge-detail', kwargs={'pk': created_challenge_id})
         )
         self.assertEqual(response2.status_code, status.HTTP_404_NOT_FOUND)  # miramos que existe la solicitud
 

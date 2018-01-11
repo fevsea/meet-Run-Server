@@ -1,5 +1,3 @@
-from collections import OrderedDict
-import unittest
 from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
@@ -12,11 +10,7 @@ from populateDB import createBasicUser2
 
 class FriendsTests(APITestCase):
     def setUp(self):
-        '''populate()
-        self.user = User.objects.get(username='awaisI')
-        token = Token.objects.create(user=self.user)
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
-        token.save()'''
+        pass
 
     def test_add_friend(self):
         createBasicUser()
@@ -29,20 +23,20 @@ class FriendsTests(APITestCase):
             reverse('friends', kwargs={'pk': 2}),
             format='json'
         )
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED) #comprobar que se ha creado la solicitud
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)  # comprobar que se ha creado la solicitud
 
         response2 = self.client.get(
             reverse('friends', kwargs={'pk': 2}),
             data={'accepted': False}
         )
-        self.assertEqual(response2.data['count'], 1) #comprobar que se ha creado la solicitud y no esta aceptada
+        self.assertEqual(response2.data['count'], 1)  # comprobar que se ha creado la solicitud y no esta aceptada
 
         self.user = User.objects.get(username='ericR')
         token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
         token.save()
 
-        response = self.client.post(        #aceptar la solicitud
+        response = self.client.post(  # aceptar la solicitud
             reverse('friends', kwargs={'pk': 1}),
             format='json'
         )
@@ -77,7 +71,6 @@ class FriendsTests(APITestCase):
             data={'accepted': False}
         )
         self.assertEqual(response2.data['count'], 0)  # comprobar que ya no hay solicitudes pendientes
-
 
     def test_add_friend_no_exists(self):
         createBasicUser()

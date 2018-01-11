@@ -1,6 +1,4 @@
-import unittest
 from collections import OrderedDict
-import unittest
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -13,11 +11,7 @@ from populateDB import createBasicUserMeeting
 
 class MeetingsTests(APITestCase):
     def setUp(self):
-        '''populate()
-        self.user = User.objects.get(username='awaisI')
-        token = Token.objects.create(user=self.user)
-        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
-        token.save()'''
+        pass
 
     def test_create_valid_meeting(self):
         self.valid_payload = {
@@ -57,8 +51,8 @@ class MeetingsTests(APITestCase):
                 'postal_code': '08019',
                 'question': 'hola?',
                 'level': 1
-        }),
-            'chat' : None
+            }),
+            'chat': None
         }
         self.assertEqual(response.data, resp)
 
@@ -84,7 +78,7 @@ class MeetingsTests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         resp = {
-            'title' : [
+            'title': [
                 "This field may not be blank."
             ],
             'level': [
@@ -467,16 +461,16 @@ class MeetingsTests(APITestCase):
                      ('latitude', '41.388576'),
                      ('longitude', '2.11284'),
                      ('owner',
-                        OrderedDict([  # cada usuario es un orderedDict
-                            ('id', 1),
-                            ('username', 'awaisI'),
-                            ('first_name', 'Awais'),
-                            ('last_name', 'Iqbal'),
-                            ('postal_code', '08019'),
-                            ('question', 'hola?'),
-                            ('level', 1)
-                        ])
-                     ),
+                      OrderedDict([  # cada usuario es un orderedDict
+                          ('id', 1),
+                          ('username', 'awaisI'),
+                          ('first_name', 'Awais'),
+                          ('last_name', 'Iqbal'),
+                          ('postal_code', '08019'),
+                          ('question', 'hola?'),
+                          ('level', 1)
+                      ])
+                      ),
                      ('chat', None)
                  ])
              ]
@@ -484,7 +478,7 @@ class MeetingsTests(APITestCase):
         ])
         self.assertEqual(response.data, resp)
 
-    #@unittest.skip
+    # @unittest.skip
     def test_participar_automaticamente(self):
         createBasicUserMeeting()
         self.user = User.objects.get(username='awaisI')
@@ -534,9 +528,8 @@ class MeetingsTests(APITestCase):
         token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
 
-
         response = self.client.post(
-            reverse('meeting-participants-user-pk', kwargs={'pk': 1, 'usr' : 2})
+            reverse('meeting-participants-user-pk', kwargs={'pk': 1, 'usr': 2})
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         response = self.client.get(
@@ -608,9 +601,9 @@ class MeetingsTests(APITestCase):
         token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
         response = self.client.get(
-            reverse('meeting-track', kwargs={'user': 1,'meeting':1})
+            reverse('meeting-track', kwargs={'user': 1, 'meeting': 1})
         )
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND) #comprobamos que no hay ningun tracking
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)  # comprobamos que no hay ningun tracking
 
         self.valid_payload = {
             "averagespeed": 19635.94,
@@ -619,20 +612,20 @@ class MeetingsTests(APITestCase):
             "totalTimeMillis": 11263,
             "calories": 0.0,
             "routePoints": [
-                {"latitude": 3.0 , "longitude" : 41.2000},
+                {"latitude": 3.0, "longitude": 41.2000},
                 {"latitude": 5.0, "longitude": 41.2000}
             ]
         }
 
         response = self.client.post(
-            reverse('meeting-track', kwargs={'user': 1,'meeting':1}),
+            reverse('meeting-track', kwargs={'user': 1, 'meeting': 1}),
             data=self.valid_payload,
             format='json'
         )
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED) #comprobamos que se ha creado
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)  # comprobamos que se ha creado
         resp = {
-            "user" : 1,
-            "meeting" : 1,
+            "user": 1,
+            "meeting": 1,
             "averagespeed": 19635.94,
             "distance": 221159.58,
             "steps": 0,
@@ -640,8 +633,8 @@ class MeetingsTests(APITestCase):
             "calories": 0.0,
             "routePoints": [
                 OrderedDict([
-                    ('latitude',3.0),
-                    ('longitude',41.2000)
+                    ('latitude', 3.0),
+                    ('longitude', 41.2000)
                 ]),
                 OrderedDict([
                     ('latitude', 5.0),
@@ -649,7 +642,7 @@ class MeetingsTests(APITestCase):
                 ])
             ]
         }
-        self.assertEqual(response.data, resp) #check el contenido del tracking
+        self.assertEqual(response.data, resp)  # check el contenido del tracking
 
         response = self.client.get(
             reverse('meeting-track', kwargs={'user': 1, 'meeting': 1})
@@ -688,8 +681,3 @@ class MeetingsTests(APITestCase):
             reverse('meeting-track', kwargs={'user': 1, 'meeting': 1})
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)  # comprobamos que no hay ningun tracking
-
-
-
-
-
