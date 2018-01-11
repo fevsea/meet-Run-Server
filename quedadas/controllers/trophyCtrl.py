@@ -232,5 +232,5 @@ def check_friends(user):
 
 def check(stats, old, new, prefix, values):
     for treshold in values:
-        if old < treshold <= new:
+        if old < treshold and new >= treshold:
             firebaseCtrl.trophy_obtained(stats, prefix + '_' + str(treshold))

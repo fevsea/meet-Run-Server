@@ -111,7 +111,7 @@ class Statistics(models.Model):
 
 
 @receiver(post_save, sender=Tracking, dispatch_uid="update_statistics")
-def update_stats(_, instance, **kwargs):
+def update_stats(sender, instance, **kwargs):
     meetingCtrl.update_stats(instance)
     rankingsCtrl.update_zone_ranking(instance)
 
@@ -135,7 +135,7 @@ class Profile(models.Model):
 
     def save(self, *args, **kwargs):
         if self.pk:
-            old = Profile.objects.get(pk=self.pk)
+            old = Profile.objects.get(pk=self.pk).level
             new = self.level
             if old != new:
                 trophyCtrl.check_level(self.statistics, old, new)
@@ -150,7 +150,7 @@ class Profile(models.Model):
 
 
 @receiver(post_save, sender=Profile, dispatch_uid="update_stock_count")
-def init_statistics(_, instance, **kwargs):
+def init_statistics(sender, instance, **kwargs):
     if instance.statistics is None:
         statistic = Statistics()
         statistic.save()
@@ -213,7 +213,7 @@ class Challenge(models.Model):
 
 
 @receiver(post_save, sender=Tracking, dispatch_uid="update_challenge_statistics")
-def update_challenge_statistics(_, instance, **kwargs):
+def update_challenge_statistics(sender, instance, **kwargs):
     user = instance.user
     challenges_creator = user.challenge_creator.filter(completed=False)
     challenges_challenged = user.challenged.filter(completed=False)
@@ -222,7 +222,7 @@ def update_challenge_statistics(_, instance, **kwargs):
 
 
 @receiver(post_save, sender=Challenge, dispatch_uid="notify_new_challenge")
-def notify_user(_, instance, **kwargs):
+def notify_user(sender, instance, **kwargs):
     firebaseCtrl.new_challenge(instance)
 
 

@@ -8,23 +8,23 @@ from rest_framework.reverse import reverse
 @api_view(['GET'])
 def api_root(request):
     return Response({
-        'meetings': reverse('meeting_list', request=request, format=format),
-        'users': reverse('user-list', request=request, format=format),
-        'chats': reverse('chat-list', request=request, format=format),
-        'challenges': reverse('challenge-list', request=request, format=format),
-        'rankings': reverse('rankings-index', request=request, format=format),
-        'trophies': reverse('trophies', request=request, format=format),
-        'feed': reverse('feed', request=request, format=format),
+        'meetings': reverse('meeting_list', request=request),
+        'users': reverse('user-list', request=request),
+        'chats': reverse('chat-list', request=request),
+        'challenges': reverse('challenge-list', request=request),
+        'rankings': reverse('rankings-index', request=request),
+        'trophies': reverse('trophies', request=request),
+        'feed': reverse('feed', request=request),
         'admin': ''.join(['http://', get_current_site(request).domain, "/admin"]),
-        'docs': reverse('docs', request=request, format=format),
+        'docs': reverse('docs', request=request),
     })
 
 
 @api_view(['GET'])
 def ranking_root(request):
     return Response({
-        'zone': reverse('ranking-zone', request=request, format=format),
-        'users': reverse('ranking-users', request=request, format=format),
-        'zips': reverse('zip-list', request=request, format=format),
+        'zone': reverse('ranking-zone', request=request),
+        'users': reverse('ranking-users', request=request),
+        'zips': reverse('zip-list', request=request),
 
     })
