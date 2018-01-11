@@ -171,3 +171,9 @@ class RankingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = ("id", "username", "first_name", "last_name", "postal_code", "distance")
+
+class FeedSerializer(serializers.Serializer):
+    meeting = MeetingSerializer(many=False, read_only=True)
+    type = serializers.IntegerField()
+    friend = UserSerializerDetail(many=False, read_only=True, allow_null=True)
+    tracking = TrackingSerializer(many=False, read_only=True, allow_null=True)

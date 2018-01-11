@@ -19,7 +19,7 @@ from quedadas.controllers import firebaseCtrl, trophyCtrl, userCtrl
 from quedadas.models import Friendship
 from quedadas.permissions import IsOwnerOrReadOnly
 from quedadas.serializers import UserSerializer, UserSerializerDetail, ChangePassword, StatsSerializer, \
-    TokenSerializer, FriendSerializer
+    TokenSerializer, FriendSerializer, FeedSerializer
 
 
 class UserList(generics.ListCreateAPIView):
@@ -230,4 +230,16 @@ class Ban(APIView):
         else:
             userCtrl.ban_request(request.user, user)
         return Response(status=status)
+
+class Feed(generics.ListAPIView):
+    permission_classes = (IsAuthenticated,)
+    serializer_class = FeedSerializer
+    pagination_class = None
+
+    def get_queryset(self):
+        pk = self.kwargs.get('pk', None)
+        if pk is None:
+            pk = self.request.user.pk
+        user = get_object_or_404(User, pk=pk)
+        return userCtrl.getFeed(user)
 
