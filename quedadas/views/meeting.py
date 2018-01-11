@@ -13,14 +13,14 @@ from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST, HTTP_2
 from rest_framework.views import APIView
 
 from quedadas.models import Meeting, Tracking
-from quedadas.permissions import IsOwnerOrReadOnly
+from quedadas.permissions import IsOwnerOrReadOnly, IsNotBaned
 from quedadas.serializers import MeetingSerializer, TrackingSerializer, UserSerializerDetail
 
 
 class MeetingList(generics.ListCreateAPIView):
     queryset = Meeting.objects.all().order_by("date")
     serializer_class = MeetingSerializer
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly, IsNotBaned)
     filter_backends = (filters.SearchFilter,)
     search_fields = ('title', 'description')
 
@@ -98,7 +98,7 @@ class UserMeeting(generics.ListAPIView):
 
 
 class JoinMeeting(APIView):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated, IsNotBaned)
     pagination_class = api_settings.DEFAULT_PAGINATION_CLASS
 
     def get(self, request, pk, usr=None):
