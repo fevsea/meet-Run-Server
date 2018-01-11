@@ -86,3 +86,18 @@ def trophy_obtained(stats, name):
         "trophy_name": name
     }
     notify_user(user, data)
+
+
+def baned(user, days):
+    data = {
+        "type": "baned",
+        "days": days
+    }
+    notify_user(user, data)
+
+
+def unBaned(user):
+    data = {
+        "type": "un_baned",
+    }
+    notify_user(user, data)
