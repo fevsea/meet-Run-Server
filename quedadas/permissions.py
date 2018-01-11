@@ -1,7 +1,4 @@
-from django.contrib.auth.models import User
 from rest_framework import permissions
-
-from quedadas.models import Meeting
 
 
 class IsNotBaned(permissions.BasePermission):
