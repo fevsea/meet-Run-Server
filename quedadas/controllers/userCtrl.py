@@ -16,13 +16,13 @@ def ban_request(requestor, user):
             firebaseCtrl.baned(user, 7)
 
 
-def unBan(baned):
+def un_ban(baned):
     baned.ban_date = None
     baned.save()
-    firebaseCtrl.unBaned(baned.user)
+    firebaseCtrl.un_baned(baned.user)
 
 
-def getFeed(user):
+def get_feed(user):
     feed = []
     friends = user.prof.get_friends()
     for friend in friends:
@@ -37,10 +37,9 @@ def getFeed(user):
             feed.append(Feed(m, 1, m.created, friend))
 
     # Near meetings
-    near = Meeting.objects.filter(owner__prof__postal_code = user.prof.postal_code).filter(date__gt=timezone.now()).order_by("-created")[:10]
+    near = Meeting.objects.filter(owner__prof__postal_code=user.prof.postal_code).filter(
+        date__gt=timezone.now()).order_by("-created")[:10]
     for m in near:
         feed.append(Feed(m, 3, m.created))
 
     return sorted(feed, key=lambda x: x.date, reverse=True)
-
-

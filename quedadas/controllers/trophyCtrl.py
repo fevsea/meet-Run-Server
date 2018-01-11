@@ -2,7 +2,14 @@ from rest_framework import serializers
 
 from quedadas.controllers import firebaseCtrl
 
+
 class TrophySerializer(serializers.Serializer):
+    def update(self, instance, validated_data):
+        pass
+
+    def create(self, validated_data):
+        pass
+
     km_1 = serializers.SerializerMethodField()
     km_10 = serializers.SerializerMethodField()
     km_100 = serializers.SerializerMethodField()
@@ -189,33 +196,41 @@ class TrophySerializer(serializers.Serializer):
     def get_friends_20(obj):
         return obj.prof.friend_number >= 20
 
+
 def check_km(stats, old, new):
     check(stats, old, new, "km", [1, 10, 100, 1000])
 
+
 def check_h(stats, old, new):
-    check(stats, old/(3600*1000), new/(3600*1000), "h", [1, 10, 100, 1000])
+    check(stats, old / (3600 * 1000), new / (3600 * 1000), "h", [1, 10, 100, 1000])
+
 
 def check_meetings(stats, old, new):
     check(stats, old, new, "meetings", [1, 5, 10, 20, 50])
 
+
 def check_level(stats, old, new):
     check(stats, old, new, "level", [1, 5, 10, 20, 25, 40, 50])
+
 
 def check_max_distance(stats, old, new):
     check(stats, old, new, "max_distance", [1, 5, 10, 21, 42])
 
+
 def check_steps(stats, old, new):
     check(stats, old, new, "steps", [10000, 20000, 25000, 50000, 100000])
 
+
 def check_challenges(stats, old, new):
     check(stats, old, new, "challenges", [1, 5, 10, 20])
+
 
 def check_friends(user):
     friends = user.prof.friend_number
     check(user.prof.statistics, friends - 1, friends, "friends", [1, 5, 10, 20])
 
+
 def check(stats, old, new, prefix, values):
     for treshold in values:
-        if old < treshold and new >= treshold:
+        if old < treshold <= new:
             firebaseCtrl.trophy_obtained(stats, prefix + '_' + str(treshold))
-

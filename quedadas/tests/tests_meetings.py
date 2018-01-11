@@ -1,14 +1,14 @@
-import unittest
 from collections import OrderedDict
-import unittest
+
+from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase
-from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
-from populateDB import createBasicUser
-from populateDB import createBasicUser2
-from populateDB import createBasicUserMeeting
+from rest_framework.test import APITestCase
+
+from populateDB import create_basic_user
+from populateDB import create_basic_user_2
+from populateDB import create_basic_user_meeting
 
 
 class MeetingsTests(APITestCase):
@@ -30,7 +30,7 @@ class MeetingsTests(APITestCase):
             "longitude": "2.11284",
             "chat": None
         }
-        createBasicUser()
+        create_basic_user()
         self.user = User.objects.get(username='awaisI')
         token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
@@ -57,8 +57,8 @@ class MeetingsTests(APITestCase):
                 'postal_code': '08019',
                 'question': 'hola?',
                 'level': 1
-        }),
-            'chat' : None
+            }),
+            'chat': None
         }
         self.assertEqual(response.data, resp)
 
@@ -73,7 +73,7 @@ class MeetingsTests(APITestCase):
             "longitude": "",
             "chat": None
         }
-        createBasicUser()
+        create_basic_user()
         self.user = User.objects.get(username='awaisI')
         token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
@@ -84,7 +84,7 @@ class MeetingsTests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         resp = {
-            'title' : [
+            'title': [
                 "This field may not be blank."
             ],
             'level': [
@@ -103,7 +103,7 @@ class MeetingsTests(APITestCase):
         self.assertEqual(response.data, resp)
 
     def test_get_meeting(self):
-        createBasicUserMeeting()
+        create_basic_user_meeting()
         self.user = User.objects.get(username='awaisI')
         token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
@@ -134,7 +134,7 @@ class MeetingsTests(APITestCase):
         self.assertEqual(response.data, resp)
 
     def test_update_meeting_title(self):
-        createBasicUserMeeting()
+        create_basic_user_meeting()
         self.user = User.objects.get(username='awaisI')
         token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
@@ -176,7 +176,7 @@ class MeetingsTests(APITestCase):
         self.assertEqual(response.data, resp)
 
     def test_update_meeting_description(self):
-        createBasicUserMeeting()
+        create_basic_user_meeting()
         self.user = User.objects.get(username='awaisI')
         token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
@@ -218,7 +218,7 @@ class MeetingsTests(APITestCase):
         self.assertEqual(response.data, resp)
 
     def test_update_meeting_public(self):
-        createBasicUserMeeting()
+        create_basic_user_meeting()
         self.user = User.objects.get(username='awaisI')
         token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
@@ -260,7 +260,7 @@ class MeetingsTests(APITestCase):
         self.assertEqual(response.data, resp)
 
     def test_update_meeting_level(self):
-        createBasicUserMeeting()
+        create_basic_user_meeting()
         self.user = User.objects.get(username='awaisI')
         token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
@@ -302,7 +302,7 @@ class MeetingsTests(APITestCase):
         self.assertEqual(response.data, resp)
 
     def test_update_meeting_date(self):
-        createBasicUserMeeting()
+        create_basic_user_meeting()
         self.user = User.objects.get(username='awaisI')
         token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
@@ -344,7 +344,7 @@ class MeetingsTests(APITestCase):
         self.assertEqual(response.data, resp)
 
     def test_update_meeting_lat(self):
-        createBasicUserMeeting()
+        create_basic_user_meeting()
         self.user = User.objects.get(username='awaisI')
         token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
@@ -386,7 +386,7 @@ class MeetingsTests(APITestCase):
         self.assertEqual(response.data, resp)
 
     def test_update_meeting_lon(self):
-        createBasicUserMeeting()
+        create_basic_user_meeting()
         self.user = User.objects.get(username='awaisI')
         token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
@@ -428,7 +428,7 @@ class MeetingsTests(APITestCase):
         self.assertEqual(response.data, resp)
 
     def test_delete_meeting(self):
-        createBasicUserMeeting()
+        create_basic_user_meeting()
         self.user = User.objects.get(username='awaisI')
         token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
@@ -445,7 +445,7 @@ class MeetingsTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_get_meetings(self):
-        createBasicUserMeeting()
+        create_basic_user_meeting()
         response = self.client.get(
             reverse('meeting_list'),
             format='json'
@@ -467,16 +467,16 @@ class MeetingsTests(APITestCase):
                      ('latitude', '41.388576'),
                      ('longitude', '2.11284'),
                      ('owner',
-                        OrderedDict([  # cada usuario es un orderedDict
-                            ('id', 1),
-                            ('username', 'awaisI'),
-                            ('first_name', 'Awais'),
-                            ('last_name', 'Iqbal'),
-                            ('postal_code', '08019'),
-                            ('question', 'hola?'),
-                            ('level', 1)
-                        ])
-                     ),
+                      OrderedDict([  # cada usuario es un orderedDict
+                          ('id', 1),
+                          ('username', 'awaisI'),
+                          ('first_name', 'Awais'),
+                          ('last_name', 'Iqbal'),
+                          ('postal_code', '08019'),
+                          ('question', 'hola?'),
+                          ('level', 1)
+                      ])
+                      ),
                      ('chat', None)
                  ])
              ]
@@ -484,9 +484,9 @@ class MeetingsTests(APITestCase):
         ])
         self.assertEqual(response.data, resp)
 
-    #@unittest.skip
+    # @unittest.skip
     def test_participar_automaticamente(self):
-        createBasicUserMeeting()
+        create_basic_user_meeting()
         self.user = User.objects.get(username='awaisI')
         token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
@@ -517,8 +517,8 @@ class MeetingsTests(APITestCase):
         self.assertEqual(response.data, resp)
 
     def test_join_leave_meeting(self):
-        createBasicUserMeeting()
-        createBasicUser2()
+        create_basic_user_meeting()
+        create_basic_user_2()
         '''TODO borrar todo desde aqui...(falta que el ser añada el creador automaticamente)'''
         '''self.user = User.objects.get(username='awaisI')
         token = Token.objects.create(user=self.user)
@@ -534,9 +534,8 @@ class MeetingsTests(APITestCase):
         token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
 
-
         response = self.client.post(
-            reverse('meeting-participants-user-pk', kwargs={'pk': 1, 'usr' : 2})
+            reverse('meeting-participants-user-pk', kwargs={'pk': 1, 'usr': 2})
         )
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         response = self.client.get(
@@ -603,14 +602,14 @@ class MeetingsTests(APITestCase):
         self.assertEqual(response.data, resp)
 
     def test_add_get_delete_meeting_tracking(self):
-        createBasicUserMeeting()
+        create_basic_user_meeting()
         self.user = User.objects.get(username='awaisI')
         token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
         response = self.client.get(
-            reverse('meeting-track', kwargs={'user': 1,'meeting':1})
+            reverse('meeting-track', kwargs={'user': 1, 'meeting': 1})
         )
-        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND) #comprobamos que no hay ningun tracking
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)  # comprobamos que no hay ningun tracking
 
         self.valid_payload = {
             "averagespeed": 19635.94,
@@ -619,20 +618,20 @@ class MeetingsTests(APITestCase):
             "totalTimeMillis": 11263,
             "calories": 0.0,
             "routePoints": [
-                {"latitude": 3.0 , "longitude" : 41.2000},
+                {"latitude": 3.0, "longitude": 41.2000},
                 {"latitude": 5.0, "longitude": 41.2000}
             ]
         }
 
         response = self.client.post(
-            reverse('meeting-track', kwargs={'user': 1,'meeting':1}),
+            reverse('meeting-track', kwargs={'user': 1, 'meeting': 1}),
             data=self.valid_payload,
             format='json'
         )
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED) #comprobamos que se ha creado
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)  # comprobamos que se ha creado
         resp = {
-            "user" : 1,
-            "meeting" : 1,
+            "user": 1,
+            "meeting": 1,
             "averagespeed": 19635.94,
             "distance": 221159.58,
             "steps": 0,
@@ -640,8 +639,8 @@ class MeetingsTests(APITestCase):
             "calories": 0.0,
             "routePoints": [
                 OrderedDict([
-                    ('latitude',3.0),
-                    ('longitude',41.2000)
+                    ('latitude', 3.0),
+                    ('longitude', 41.2000)
                 ]),
                 OrderedDict([
                     ('latitude', 5.0),
@@ -649,7 +648,7 @@ class MeetingsTests(APITestCase):
                 ])
             ]
         }
-        self.assertEqual(response.data, resp) #check el contenido del tracking
+        self.assertEqual(response.data, resp)  # check el contenido del tracking
 
         response = self.client.get(
             reverse('meeting-track', kwargs={'user': 1, 'meeting': 1})
@@ -688,8 +687,3 @@ class MeetingsTests(APITestCase):
             reverse('meeting-track', kwargs={'user': 1, 'meeting': 1})
         )
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)  # comprobamos que no hay ningun tracking
-
-
-
-
-

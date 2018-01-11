@@ -6,7 +6,7 @@ from rest_framework.reverse import reverse
 
 
 @api_view(['GET'])
-def api_root(request, format=None):
+def api_root(request):
     return Response({
         'meetings': reverse('meeting_list', request=request, format=format),
         'users': reverse('user-list', request=request, format=format),
@@ -21,11 +21,10 @@ def api_root(request, format=None):
 
 
 @api_view(['GET'])
-def ranking_root(request, format=None):
+def ranking_root(request):
     return Response({
         'zone': reverse('ranking-zone', request=request, format=format),
         'users': reverse('ranking-users', request=request, format=format),
         'zips': reverse('zip-list', request=request, format=format),
 
     })
-

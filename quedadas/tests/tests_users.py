@@ -1,12 +1,12 @@
-import unittest
 from collections import OrderedDict
-import unittest
+
+from django.contrib.auth.models import User
 from django.urls import reverse
 from rest_framework import status
-from rest_framework.test import APITestCase
-from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
-from populateDB import createBasicUser
+from rest_framework.test import APITestCase
+
+from populateDB import create_basic_user
 
 
 class UsersTests(APITestCase):
@@ -80,7 +80,7 @@ class UsersTests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         resp = {
-            "username" : ["A user with that username already exists."]
+            "username": ["A user with that username already exists."]
         }
         self.assertEqual(response.data, resp)
 
@@ -103,7 +103,7 @@ class UsersTests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         resp = {
-            "username" : ["This field may not be blank."],
+            "username": ["This field may not be blank."],
             "password": ["This field may not be blank."],
             "postal_code": ["This field may not be blank."],
             "question": ["This field may not be blank."],
@@ -114,7 +114,7 @@ class UsersTests(APITestCase):
         self.assertEqual(response.data, resp)
 
     def test_get_user(self):
-        createBasicUser()
+        create_basic_user()
         response = self.client.get(
             reverse('user-detail', kwargs={'pk': 1}),
             format='json'
@@ -132,34 +132,34 @@ class UsersTests(APITestCase):
         self.assertEqual(response.data, resp)
 
     def test_get_users(self):
-        createBasicUser()
+        create_basic_user()
         response = self.client.get(
             reverse('user-list'),
             format='json'
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         resp = OrderedDict([
-            ('count',1),
+            ('count', 1),
             ('next', None),
             ('previous', None),
             ('results',
-             [  #array de usuarios
-                 OrderedDict([ #cada usuario es un orderedDict
-                 ('id', 1),
-                 ('username', 'awaisI'),
-                 ('first_name', 'Awais'),
-                 ('last_name', 'Iqbal'),
-                 ('postal_code', '08019'),
-                 ('question', 'hola?'),
-                 ('level', 1),
-                ])
+             [  # array de usuarios
+                 OrderedDict([  # cada usuario es un orderedDict
+                     ('id', 1),
+                     ('username', 'awaisI'),
+                     ('first_name', 'Awais'),
+                     ('last_name', 'Iqbal'),
+                     ('postal_code', '08019'),
+                     ('question', 'hola?'),
+                     ('level', 1),
+                 ])
              ]
              )
         ])
         self.assertEqual(response.data, resp)
 
     def test_update_user(self):
-        createBasicUser()
+        create_basic_user()
         self.user = User.objects.get(username='awaisI')
         token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
@@ -174,7 +174,7 @@ class UsersTests(APITestCase):
             "level": 3
         }
         response = self.client.patch(
-            reverse('user-detail', kwargs={'pk':1}),
+            reverse('user-detail', kwargs={'pk': 1}),
             data=self.valid_payload,
             format='json'
         )
@@ -191,20 +191,20 @@ class UsersTests(APITestCase):
         self.assertEqual(response.data, resp)
 
     def test_delete_user(self):
-        createBasicUser()
+        create_basic_user()
         self.user = User.objects.get(username='awaisI')
         token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
         token.save()
 
         response = self.client.delete(
-            reverse('user-detail', kwargs={'pk':1}),
+            reverse('user-detail', kwargs={'pk': 1}),
             format='json'
         )
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
 
     def test_get_current_user(self):
-        createBasicUser()
+        create_basic_user()
         self.user = User.objects.get(username='awaisI')
         token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
@@ -226,7 +226,7 @@ class UsersTests(APITestCase):
         self.assertEqual(response.data, resp)
 
     def test_change_password(self):
-        createBasicUser()
+        create_basic_user()
         self.user = User.objects.get(username='awaisI')
         token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
@@ -254,7 +254,7 @@ class UsersTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_update_get_firebase_token(self):
-        createBasicUser()
+        create_basic_user()
         self.user = User.objects.get(username='awaisI')
         token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
@@ -276,6 +276,6 @@ class UsersTests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         resp = {
-                'token': tok
+            'token': tok
         }
         self.assertEqual(response.data, resp)

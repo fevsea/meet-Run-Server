@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 from django.utils import timezone
 
-from quedadas.controllers import firebaseCtrl, userCtrl
+from quedadas.controllers import userCtrl
 from quedadas.models import Challenge, Profile
 
 
@@ -15,6 +15,6 @@ class Command(BaseCommand):
 
         to_check = Profile.objects.filter(ban_date__lte=timezone.now())
         for baned in to_check:
-            userCtrl.unBan(baned)
+            userCtrl.un_ban(baned)
 
         self.stdout.write("OK, done, that's all")

@@ -1,12 +1,10 @@
-import copy
-
 from quedadas.controllers import trophyCtrl
 
 
-def update_stats(sender, instance, **kwargs):
+def update_stats(instance):
     stats = instance.user.prof.statistics
 
-    trophyCtrl.check_km(stats, stats.distance, stats.distance+instance.distance)
+    trophyCtrl.check_km(stats, stats.distance, stats.distance + instance.distance)
     stats.distance += instance.distance
 
     trophyCtrl.check_steps(stats, stats.steps, stats.steps + instance.steps)
