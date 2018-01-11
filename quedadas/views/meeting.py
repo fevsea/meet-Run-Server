@@ -80,15 +80,16 @@ class UserMeeting(generics.ListAPIView):
             user = get_object_or_404(User, pk=pk)
 
         qs = (user.meetings_at.all() | user.meetings.all()).distinct()
+        qs_b = (user.meetings_at.all() | user.meetings.all()).distinct()
         filt = self.request.query_params.get('filter', None)
 
         if filter is None or filter == "all":
             pass
         elif filt == "past":
-            qs = qs.filter(date__lt=timezone.now())
+            qs = (qs.filter(date__lt=timezone.now()) | qs_b.filter(tracks__in=user.tracks.all())).distinct()
         elif filt == "future":
             qs = qs.filter(date__gte=timezone.now()).exclude(tracks__in=user.tracks.all())
-        return qs.order_by("date")
+        return qs.order_by("-date")
 
     serializer_class = MeetingSerializer
     permission_classes = (permissions.IsAuthenticated,)

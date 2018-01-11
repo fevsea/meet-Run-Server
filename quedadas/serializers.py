@@ -100,9 +100,13 @@ class TrackingSerializer(serializers.ModelSerializer):
         fields = ('user', 'meeting', 'averagespeed', 'distance', 'steps', 'totalTimeMillis', 'calories', 'routePoints')
 
     def create(self, validated_data):
+        seconds = validated_data["totalTimeMillis"] / 1000
         points_data = validated_data.pop('routePoints')
         tracking = Tracking.objects.create(**validated_data)
-        for track_data in points_data:
+        rate = 1
+        if len(points_data) > 10:
+            rate = int(len(points_data) // (seconds / 3))
+        for track_data in points_data[::rate]:
             RoutePoint.objects.create(track=tracking, **track_data)
         return tracking
 

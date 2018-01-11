@@ -27,7 +27,7 @@ def get_feed(user):
     friends = user.prof.get_friends()
     for friend in friends:
         # Past tracks
-        tracks = Tracking.objects.order_by("-created")[:10]
+        tracks = Tracking.objects.filter(user=friend).order_by ("-created")[:10]
         for t in tracks:
             feed.append(Feed(t.meeting, 0, t.created, friend, t))
 
@@ -42,4 +42,4 @@ def get_feed(user):
     for m in near:
         feed.append(Feed(m, 3, m.created))
 
-    return sorted(feed, key=lambda x: x.date, reverse=True)
+    return sorted(feed, key=lambda x: x.date, reverse=True)[:10]

@@ -124,7 +124,7 @@ class Profile(models.Model):
     level = models.IntegerField(null=False, blank=False, default=0)
     statistics = models.OneToOneField(Statistics, on_delete=models.CASCADE, related_name='prof', null=True, blank=True)
     token = models.CharField(null=True, blank=True, max_length=256)
-    ban_count = models.ManyToManyField(User)
+    ban_count = models.ManyToManyField(User, blank=True)
     ban_date = models.DateTimeField(null=True, blank=True)
 
     def get_friends(self):
