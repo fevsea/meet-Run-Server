@@ -221,9 +221,13 @@ class Ban(APIView):
     permission_classes = (IsAuthenticated,)
 
     def post(self, request, pk=None):
+        status = 200
         if pk is None:
             pk = request.user.pk
         user = get_object_or_404(User, pk=pk)
-        userCtrl.ban_request(user)
-
+        if request.user in user.prof.ban_count.all():
+            status = 403
+        else:
+            userCtrl.ban_request(request.user, user)
+        return Response(status=status)
 
