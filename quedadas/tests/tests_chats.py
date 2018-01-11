@@ -32,7 +32,7 @@ class ChatsTests(APITestCase):
             "type": 1,
             "meeting": 1,
             "lastMessage": "Hola",
-            "lastMessageUserName": 0,
+            "lastMessageUserName": "awaisI",
             "lastDateTime": "2017-11-28T10:52:39"
         }
         ''' Creamos un chat'''
@@ -88,7 +88,7 @@ class ChatsTests(APITestCase):
                 ('chat', 1)
             ]),
             'lastMessage': 'Hola',
-            'lastMessageUserName': 0,
+            'lastMessageUserName': "awaisI",
             'lastDateTime': '2017-11-28T10:52:39Z'
         }
         self.assertEqual(response.data, resp)  # comrpobamos el formato retornado en Json
@@ -161,7 +161,7 @@ class ChatsTests(APITestCase):
                      ])
                      ),
                     ('lastMessage', 'Hola'),
-                    ('lastMessageUserName', 0),
+                    ('lastMessageUserName', "awaisI"),
                     ('lastDateTime', '2017-11-28T10:52:39Z')
 
                 ])]
@@ -195,7 +195,7 @@ class ChatsTests(APITestCase):
             "type": 1,
             "meeting": 1,
             "lastMessage": "Hola",
-            "lastMessageUserName": 0,
+            "lastMessageUserName": "awaisI",
             "lastDateTime": "2017-11-28T10:52:39"
         }
         ''' Creamos un chat'''
@@ -251,7 +251,7 @@ class ChatsTests(APITestCase):
                 ('chat', 1)
             ]),
             'lastMessage': 'Hola',
-            'lastMessageUserName': 0,
+            'lastMessageUserName': "awaisI",
             'lastDateTime': '2017-11-28T10:52:39Z'
         }
         self.assertEqual(response.data, resp)  # comrpobamos el formato retornado en Json
@@ -277,7 +277,7 @@ class ChatsTests(APITestCase):
             "type": 1,
             "meeting": 1,
             "lastMessage": "Hola",
-            "lastMessageUserName": 0,
+            "lastMessageUserName": "awaisI",
             "lastDateTime": "2017-11-28T10:52:39"
         }
         ''' Creamos un chat'''
@@ -333,7 +333,7 @@ class ChatsTests(APITestCase):
                 ('chat', 1)
             ]),
             'lastMessage': 'Hola',
-            'lastMessageUserName': 0,
+            'lastMessageUserName': "awaisI",
             'lastDateTime': '2017-11-28T10:52:39Z'
         }
         self.assertEqual(response.data, resp)  # comrpobamos el formato retornado en Json
@@ -346,7 +346,7 @@ class ChatsTests(APITestCase):
             "type": 1,
             "meeting": 1,
             "lastMessage": "Hola",
-            "lastMessageUserName": 0,
+            "lastMessageUserName": "awaisI",
             "lastDateTime": "2017-11-28T10:52:39"
         }
         response = self.client.put(
@@ -369,7 +369,7 @@ class ChatsTests(APITestCase):
             "type": 1,
             "meeting": 1,
             "lastMessage": "Hola",
-            "lastMessageUserName": 0,
+            "lastMessageUserName": "awaisI",
             "lastDateTime": "2017-11-28T10:52:39"
         }
         ''' Creamos un chat'''
@@ -425,7 +425,7 @@ class ChatsTests(APITestCase):
                 ('chat', 1)
             ]),
             'lastMessage': 'Hola',
-            'lastMessageUserName': 0,
+            'lastMessageUserName': "awaisI",
             'lastDateTime': '2017-11-28T10:52:39Z'
         }
         self.assertEqual(response.data, resp)  # comrpobamos el formato retornado en Json
@@ -438,7 +438,7 @@ class ChatsTests(APITestCase):
             "type": 1,
             "meeting": 1,
             "lastMessage": "Hola",
-            "lastMessageUserName": 0,
+            "lastMessageUserName": "awaisI",
             "lastDateTime": "2017-11-28T10:52:39"
         }
         response = self.client.put(
@@ -489,7 +489,7 @@ class ChatsTests(APITestCase):
                 ('chat', 1)
             ]),
             'lastMessage': 'Hola',
-            'lastMessageUserName': 0,
+            'lastMessageUserName': "awaisI",
             'lastDateTime': '2017-11-28T10:52:39Z'
         }
         self.assertEqual(response.data, resp)  # comprobamos que la respuesta sea correcta
@@ -501,7 +501,7 @@ class ChatsTests(APITestCase):
             "type": 1,
             "meeting": 1,
             "lastMessage": "Hola",
-            "lastMessageUserName": 0,
+            "lastMessageUserName": "awaisI",
             "lastDateTime": "2017-11-28T10:52:39"
         }
         ''' Creamos un chat'''
@@ -558,7 +558,7 @@ class ChatsTests(APITestCase):
                 ('chat', 1)
             ]),
             'lastMessage': 'Hola',
-            'lastMessageUserName': 0,
+            'lastMessageUserName': "awaisI",
             'lastDateTime': '2017-11-28T10:52:39Z'
         }
         self.assertEqual(response.data, resp)  # comrpobamos el formato retornado en Json
@@ -571,7 +571,7 @@ class ChatsTests(APITestCase):
             "type": 1,
             "meeting": 1,
             "lastMessage": "Hola",
-            "lastMessageUserName": 0,
+            "lastMessageUserName": "awaisI",
             "lastDateTime": "2017-11-28T10:52:39"
         }
         response = self.client.put(
@@ -588,7 +588,7 @@ class ChatsTests(APITestCase):
             "type": 1,
             "meeting": 1,
             "lastMessage": "Hola",
-            "lastMessageUserName": 0,
+            "lastMessageUserName": "awaisI",
             "lastDateTime": "2017-11-28T10:52:39"
         }
         ''' Creamos un chat'''
@@ -645,7 +645,7 @@ class ChatsTests(APITestCase):
                 ('chat', 1)
             ]),
             'lastMessage': 'Hola',
-            'lastMessageUserName': 0,
+            'lastMessageUserName': "awaisI",
             'lastDateTime': '2017-11-28T10:52:39Z'
         }
         self.assertEqual(response.data, resp)  # comrpobamos el formato retornado en Json
@@ -658,7 +658,7 @@ class ChatsTests(APITestCase):
             "type": 1,
             "meeting": 1,
             "lastMessage": "Adios",
-            "lastMessageUserName": 1,
+            "lastMessageUserName": "ericR",
             "lastDateTime": "2017-11-29T10:52:39"
         }
         response = self.client.put(
@@ -672,7 +672,7 @@ class ChatsTests(APITestCase):
         )
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         resp['lastMessage'] = "Adios"
-        resp['lastMessageUserName'] = 1
+        resp['lastMessageUserName'] = "ericR"
         resp['lastDateTime'] = "2017-11-29T10:52:39Z"
         self.assertEqual(response.data, resp)  # comprobamos que la respuesta sea correcta
 
@@ -683,7 +683,7 @@ class ChatsTests(APITestCase):
             "type": 1,
             "meeting": 1,
             "lastMessage": "Hola",
-            "lastMessageUserName": 0,
+            "lastMessageUserName": "awaisI",
             "lastDateTime": "2017-11-28T10:52:39"
         }
         ''' Creamos un chat'''
@@ -740,7 +740,7 @@ class ChatsTests(APITestCase):
                 ('chat', 1)
             ]),
             'lastMessage': 'Hola',
-            'lastMessageUserName': 0,
+            'lastMessageUserName': "awaisI",
             'lastDateTime': '2017-11-28T10:52:39Z'
         }
         self.assertEqual(response.data, resp)  # comrpobamos el formato retornado en Json
@@ -753,7 +753,7 @@ class ChatsTests(APITestCase):
             "type": 1,
             "meeting": 3,
             "lastMessage": "Hola",
-            "lastMessageUserName": 0,
+            "lastMessageUserName": "awaisI",
             "lastDateTime": "2017-11-28T10:52:39"
         }
         response = self.client.put(
@@ -770,7 +770,7 @@ class ChatsTests(APITestCase):
             "type": 1,
             "meeting": 1,
             "lastMessage": "Hola",
-            "lastMessageUserName": 0,
+            "lastMessageUserName": "awaisI",
             "lastDateTime": "2017-11-28T10:52:39"
         }
         ''' Creamos un chat'''
@@ -827,7 +827,7 @@ class ChatsTests(APITestCase):
                 ('chat', 1)
             ]),
             'lastMessage': 'Hola',
-            'lastMessageUserName': 0,
+            'lastMessageUserName': "awaisI",
             'lastDateTime': '2017-11-28T10:52:39Z'
         }
         self.assertEqual(response.data, resp)  # comrpobamos el formato retornado en Json
@@ -840,7 +840,7 @@ class ChatsTests(APITestCase):
             "type": 1,
             "meeting": 1,
             "lastMessage": "Hola",
-            "lastMessageUserName": 0,
+            "lastMessageUserName": "awaisI",
             "lastDateTime": "2017-11-28T10:52:39"
         }
         response = self.client.put(
